@@ -94,7 +94,6 @@ export default {
     },
   },
   mounted() {
-    // Inject developer watermark — visible in DevTools Elements tab, invisible to users
     const watermark = document.createComment(' Developer: Ali Hamza Sultan ');
     this.$el.prepend(watermark);
 
