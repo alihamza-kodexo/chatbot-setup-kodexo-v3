@@ -220,7 +220,7 @@ export default {
 
       <!-- UPDATED: Display title from ENV -->
       <h2 class="mt-6 text-3xl font-medium text-center text-n-slate-12">
-        {{ brandLoginTitle }}
+        Please Login!
       </h2>
 
       <p v-if="showSignupLink" class="mt-3 text-sm text-center text-n-slate-11">

@@ -56,7 +56,7 @@ const updateAccount = async () => {
     <div class="flex-grow flex-shrink min-w-0 mt-3">
       <SectionLayout
         title="Lead Generation Webhook"
-        description="This webhook is triggered when a user completes the lead qualification flow in the Chatwoot web widget. We will send a POST request with the user's answers formatted as a JSON payload."
+        description="This webhook is triggered when a user completes the lead qualification flow in the KLBOT web widget. We will send a POST request with the user's answers formatted as a JSON payload."
       >
         <div class="grid gap-4 max-w-lg">
           <!-- Saved webhook display -->

@@ -1,6 +1,10 @@
 # ------- Branding Related Config ------- #
 - name: INSTALLATION_NAME
+<<<<<<< Updated upstream
   value: 'Kodexolabs'
+=======
+  value: 'The Agentive'
+>>>>>>> Stashed changes
 - name: LOGO_THUMBNAIL
   value: '/brand-assets/logo_thumbnail.svg'
 - name: LOGO
@@ -12,7 +16,11 @@
 - name: WIDGET_BRAND_URL
   value: 'https://kodexolabs.com'
 - name: BRAND_NAME
+<<<<<<< Updated upstream
   value: 'Kodexolabs'
+=======
+  value: 'The Agentive'
+>>>>>>> Stashed changes
 - name: TERMS_URL
   value: 'https://kodexolabs.com'
 - name: PRIVACY_URL
