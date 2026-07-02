@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :note do
-    content { 'Hey welcome to The-Agentive' }
+    content { 'Hey welcome to kodexolabs' }
     account
     user
     contact

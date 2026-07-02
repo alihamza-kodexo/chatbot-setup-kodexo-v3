@@ -1,6 +1,6 @@
 # ------- Branding Related Config ------- #
 - name: INSTALLATION_NAME
-  value: 'The Agentive'
+  value: 'Kodexolabs'
 - name: LOGO_THUMBNAIL
   value: '/brand-assets/logo_thumbnail.svg'
 - name: LOGO
@@ -8,15 +8,15 @@
 - name: LOGO_DARK
   value: '/brand-assets/logo_thumbnail.svg'
 - name: BRAND_URL
-  value: 'https://theagentive.ai/'
+  value: 'https://kodexolabs.com'
 - name: WIDGET_BRAND_URL
-  value: 'https://theagentive.ai/'
+  value: 'https://kodexolabs.com'
 - name: BRAND_NAME
-  value: 'The Agentive'
+  value: 'Kodexolabs'
 - name: TERMS_URL
-  value: 'https://theagentive.ai/'
+  value: 'https://kodexolabs.com'
 - name: PRIVACY_URL
-  value: 'https://theagentive.ai/'
+  value: 'https://kodexolabs.com'
 - name: DISPLAY_MANIFEST
   value: true
 # ------- End of Branding Related Config ------- #

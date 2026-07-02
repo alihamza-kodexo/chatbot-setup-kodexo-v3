@@ -260,8 +260,8 @@ describe PortalHelper do
   end
 
   describe '#set_og_image_url' do
-    let(:portal_name) { 'The-Agentive Portal' }
-    let(:title) { 'Welcome to The-Agentive' }
+    let(:portal_name) { 'kodexolabs Portal' }
+    let(:title) { 'Welcome to kodexolabs' }
 
     context 'when CDN URL is present' do
       before do

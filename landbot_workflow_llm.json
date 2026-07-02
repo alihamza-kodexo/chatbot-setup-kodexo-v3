@@ -1,0 +1,389 @@
+{
+  "workflow_name": "Kodexo Labs Landbot Chatbot Workflow",
+  "source_file": "Untitled document (1).pdf",
+  "source_type": "3-page screenshot PDF of a Landbot builder canvas",
+  "reconstruction_note": "The PDF is image-based. The workflow below is reconstructed from visible blocks and connections. Very small or truncated text is marked as approximate.",
+  "purpose": "Lead qualification chatbot for Kodexo Labs that routes visitors into services, project discovery, consultation booking, contact information, and final lead submission.",
+  "entry_point": "start",
+  "variables_collected": [
+    "selected_main_intent",
+    "selected_service",
+    "project_brief",
+    "timeline",
+    "budget_range",
+    "name",
+    "email",
+    "phone",
+    "referral_source",
+    "final_action"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "Starting point",
+      "message": "Where your bot begins"
+    },
+    {
+      "id": "welcome_menu",
+      "type": "buttons",
+      "label": "Main welcome menu",
+      "message": "Hello and welcome to Kodexo Labs! 👋\nHow can I help you today?",
+      "buttons": [
+        "I need a quote",
+        "Discuss my Project",
+        "Learn about your Portfolio",
+        "Learn about your Service",
+        "Book a Free Consultation",
+        "Contact and Location Info",
+        "Just exploring",
+        "Any of the above"
+      ]
+    },
+    {
+      "id": "ai_ready_for_services_primary",
+      "type": "ai_agent",
+      "label": "AI Agent - READY_FOR_SERVICES",
+      "agent_state": "READY_FOR_SERVICES",
+      "purpose": "Prepare or normalize the user's intent before showing the service selection list."
+    },
+    {
+      "id": "ai_ready_for_services_secondary",
+      "type": "ai_agent",
+      "label": "AI Agent - READY_FOR_SERVICES",
+      "agent_state": "READY_FOR_SERVICES",
+      "purpose": "Alternate READY_FOR_SERVICES branch used by menu options before service selection."
+    },
+    {
+      "id": "service_selector",
+      "type": "buttons",
+      "label": "Service selector",
+      "message": "Pick the closest match:",
+      "buttons": [
+        "AI/ML Development",
+        "Generative AI Solution",
+        "ChatGPT Integration",
+        "Business Process Automation",
+        "Conversational Voice Agent",
+        "Web Application",
+        "Mobile Applications (iOS)",
+        "Other",
+        "Any of the above"
+      ],
+      "stores": {
+        "selected_service": "button_value"
+      }
+    },
+    {
+      "id": "consultation_intro",
+      "type": "buttons",
+      "label": "Free consultation message",
+      "message": "Awesome choice! 🗓️\nBook your free 30-minute consultation with our team. We'll discuss your project, answer questions, and see how we can help.",
+      "buttons": [
+        "Book a Call Now",
+        "Continue to Select Services",
+        "Any of the above"
+      ]
+    },
+    {
+      "id": "contact_info",
+      "type": "buttons",
+      "label": "Contact and location information",
+      "message": "Here's how to reach us!\n📞 Phone: +1 210 764 2328\n✉️ Email: contact@kodexolabs.com\n\nUSA locations shown: Austin, New York, San Francisco, Chicago.\nUK location shown: London.\nPakistan location shown: Karachi.\n\nWe work with clients in all over the world! 🌎",
+      "buttons": [
+        "Discuss My Project",
+        "Any of the above"
+      ]
+    },
+    {
+      "id": "ask_project_brief",
+      "type": "question",
+      "label": "Ask project brief",
+      "message": "Tell me briefly about your project or...",
+      "input_type": "free_text",
+      "stores": {
+        "project_brief": "user_answer"
+      }
+    },
+    {
+      "id": "ai_ready_kl",
+      "type": "ai_agent",
+      "label": "AI Agent - READY_KL",
+      "agent_state": "READY_KL",
+      "purpose": "Process the project brief before asking qualification questions."
+    },
+    {
+      "id": "ask_timeline",
+      "type": "buttons",
+      "label": "Timeline qualification",
+      "message": "What's your ideal timeline?",
+      "buttons": [
+        "ASAP - We need this urgent",
+        "1-3 months",
+        "3-6 months",
+        "6+ months",
+        "Flexible / Not sure yet",
+        "Any of the above"
+      ],
+      "stores": {
+        "timeline": "button_value"
+      }
+    },
+    {
+      "id": "ask_budget",
+      "type": "buttons",
+      "label": "Budget qualification",
+      "message": "And your approximate budget range?\n(This helps us recommend the right approach)",
+      "buttons": [
+        "Under $10K",
+        "$10K - $50K",
+        "$50K - $100K",
+        "$100K+",
+        "Need guidance on budget",
+        "Any of the above"
+      ],
+      "stores": {
+        "budget_range": "button_value"
+      }
+    },
+    {
+      "id": "ask_name",
+      "type": "question",
+      "label": "Ask for a name",
+      "message": "Perfect! How should we reach you?...",
+      "input_type": "name",
+      "stores": {
+        "name": "user_answer"
+      }
+    },
+    {
+      "id": "ask_email",
+      "type": "question",
+      "label": "Ask for an email",
+      "message": "Nice to meet you, @name_kl!...",
+      "input_type": "email",
+      "stores": {
+        "email": "user_answer"
+      }
+    },
+    {
+      "id": "ask_phone",
+      "type": "question",
+      "label": "Ask for a phone",
+      "message": "Phone number in case we need to...",
+      "input_type": "phone",
+      "stores": {
+        "phone": "user_answer"
+      }
+    },
+    {
+      "id": "ask_referral_source",
+      "type": "buttons",
+      "label": "Referral source",
+      "message": "One last thing — how did you hear about us?",
+      "buttons": [
+        "Google Search",
+        "LinkedIn",
+        "Referred by Someone",
+        "Social Media",
+        "Clutch",
+        "Other",
+        "Any of the above"
+      ],
+      "stores": {
+        "referral_source": "button_value"
+      }
+    },
+    {
+      "id": "final_confirmation",
+      "type": "buttons",
+      "label": "Lead confirmation and next step",
+      "message": "Thanks @name_kl! 🎉\nOur team will review your project and get back to you within 24 hours.\nWant to skip the wait? Book a call directly with our team:",
+      "buttons": [
+        "Schedule a Call Now",
+        "I'll wait for your email",
+        "Any of the above"
+      ],
+      "stores": {
+        "final_action": "button_value"
+      }
+    },
+    {
+      "id": "lead_webhook",
+      "type": "webhook",
+      "label": "Webhook",
+      "url_visible_fragment": "https://api.hsforms...e2fe-4dd9-abcd-...",
+      "purpose": "Submit lead details to an external system. The visible URL suggests a HubSpot forms/API endpoint, but the screenshot does not show the full URL."
+    },
+    {
+      "id": "goodbye",
+      "type": "goodbye_message",
+      "label": "Goodbye message",
+      "message": "A farewell message"
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "welcome_menu"
+    },
+    {
+      "from": "welcome_menu",
+      "button": "I need a quote",
+      "to": "ai_ready_for_services_primary"
+    },
+    {
+      "from": "welcome_menu",
+      "button": "Discuss my Project",
+      "to": "service_selector"
+    },
+    {
+      "from": "welcome_menu",
+      "button": "Learn about your Portfolio",
+      "to": "ai_ready_for_services_primary"
+    },
+    {
+      "from": "welcome_menu",
+      "button": "Learn about your Service",
+      "to": "ai_ready_for_services_secondary"
+    },
+    {
+      "from": "welcome_menu",
+      "button": "Book a Free Consultation",
+      "to": "consultation_intro"
+    },
+    {
+      "from": "welcome_menu",
+      "button": "Contact and Location Info",
+      "to": "contact_info"
+    },
+    {
+      "from": "welcome_menu",
+      "button": "Just exploring",
+      "to": "ai_ready_for_services_secondary"
+    },
+    {
+      "from": "ai_ready_for_services_primary",
+      "to": "service_selector"
+    },
+    {
+      "from": "ai_ready_for_services_secondary",
+      "to": "service_selector"
+    },
+    {
+      "from": "consultation_intro",
+      "button": "Book a Call Now",
+      "to": "lead_webhook"
+    },
+    {
+      "from": "consultation_intro",
+      "button": "Continue to Select Services",
+      "to": "service_selector"
+    },
+    {
+      "from": "contact_info",
+      "button": "Discuss My Project",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "contact_info",
+      "button": "Any of the above",
+      "to": "service_selector"
+    },
+    {
+      "from": "service_selector",
+      "button": "AI/ML Development",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "service_selector",
+      "button": "Generative AI Solution",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "service_selector",
+      "button": "ChatGPT Integration",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "service_selector",
+      "button": "Business Process Automation",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "service_selector",
+      "button": "Conversational Voice Agent",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "service_selector",
+      "button": "Web Application",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "service_selector",
+      "button": "Mobile Applications (iOS)",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "service_selector",
+      "button": "Other",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "service_selector",
+      "button": "Any of the above",
+      "to": "ask_project_brief"
+    },
+    {
+      "from": "ask_project_brief",
+      "to": "ai_ready_kl"
+    },
+    {
+      "from": "ai_ready_kl",
+      "to": "ask_timeline"
+    },
+    {
+      "from": "ask_timeline",
+      "button": "any timeline option",
+      "to": "ask_budget"
+    },
+    {
+      "from": "ask_budget",
+      "button": "any budget option",
+      "to": "ask_name"
+    },
+    {
+      "from": "ask_name",
+      "to": "ask_email"
+    },
+    {
+      "from": "ask_email",
+      "to": "ask_phone"
+    },
+    {
+      "from": "ask_phone",
+      "to": "ask_referral_source"
+    },
+    {
+      "from": "ask_referral_source",
+      "button": "any referral source option",
+      "to": "final_confirmation"
+    },
+    {
+      "from": "final_confirmation",
+      "button": "Schedule a Call Now",
+      "to": "lead_webhook"
+    },
+    {
+      "from": "final_confirmation",
+      "button": "I'll wait for your email",
+      "to": "lead_webhook"
+    },
+    {
+      "from": "lead_webhook",
+      "to": "goodbye"
+    }
+  ],
+  "llm_summary": "The chatbot starts with a Kodexo Labs welcome menu. Most discovery-focused options route the user into a service selector. After the user chooses a service, the bot asks for a project brief, then uses an AI Agent state called READY_KL before collecting timeline and budget. It then collects name, email, phone, and referral source. Finally, it confirms that the team will respond within 24 hours and gives the user a choice to schedule a call or wait for email. Both final paths submit to a webhook and end with a goodbye message. The chatbot also has separate shortcut branches for booking a free consultation and viewing contact/location information."
+}

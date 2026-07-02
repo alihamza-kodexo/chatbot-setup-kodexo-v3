@@ -656,6 +656,12 @@ const menuItems = computed(() => {
           icon: 'i-lucide-bot',
           to: accountScopedRoute('agent_bots'),
         },
+        {
+          name: 'Settings Webhooks',
+          label: 'Webhooks',
+          icon: 'i-lucide-webhook',
+          to: accountScopedRoute('webhooks_settings_index'),
+        },
         // {
         //   name: 'Settings Macros',
         //   label: t('SIDEBAR.MACROS'),

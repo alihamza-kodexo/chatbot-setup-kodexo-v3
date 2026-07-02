@@ -1,5 +1,5 @@
 # Variables
-APP_NAME := The-Agentive
+APP_NAME := Kodexolabs
 RAILS_ENV ?= development
 
 # Targets

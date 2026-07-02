@@ -24,6 +24,7 @@ export default {
   data() {
     return {
       inReplyTo: null,
+      isFlowInputHidden: true,
     };
   },
   computed: {
@@ -56,15 +57,25 @@ export default {
   },
   mounted() {
     emitter.on(BUS_EVENTS.TOGGLE_REPLY_TO_MESSAGE, this.toggleReplyTo);
+    emitter.on(BUS_EVENTS.DISABLE_CHAT_INPUT, this.hideChatInput);
+    emitter.on(BUS_EVENTS.ENABLE_CHAT_INPUT, this.showChatInput);
   },
   methods: {
     ...mapActions('conversation', ['sendMessage', 'sendAttachment']),
     ...mapActions('conversationAttributes', ['getAttributes']),
+    hideChatInput() {
+      this.isFlowInputHidden = true;
+    },
+    showChatInput() {
+      this.isFlowInputHidden = false;
+    },
     async handleSendMessage(content) {
       await this.sendMessage({
         content,
         replyTo: this.inReplyTo ? this.inReplyTo.id : null,
       });
+      // Notify listeners (e.g. free-text flow branches) that a message was sent
+      emitter.emit(BUS_EVENTS.MESSAGE_SENT, { content });
       // reset replyTo message after sending
       this.inReplyTo = null;
       // Update conversation attributes on new conversation
@@ -89,6 +100,10 @@ export default {
     },
     toggleReplyTo(message) {
       this.inReplyTo = message;
+    },
+    beforeUnmount() {
+      emitter.off(BUS_EVENTS.DISABLE_CHAT_INPUT, this.hideChatInput);
+      emitter.off(BUS_EVENTS.ENABLE_CHAT_INPUT, this.showChatInput);
     },
     async sendTranscript() {
       if (this.hasEmail) {
@@ -125,6 +140,7 @@ export default {
       @dismiss="inReplyTo = null"
     />
     <ChatInputWrap
+      v-show="!isFlowInputHidden"
       class="shadow-sm"
       :on-send-message="handleSendMessage"
       :on-send-attachment="handleSendAttachment"

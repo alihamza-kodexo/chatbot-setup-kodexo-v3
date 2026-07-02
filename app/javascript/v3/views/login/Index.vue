@@ -211,12 +211,12 @@ export default {
   >
     <section class="max-w-5xl mx-auto">
       <!-- UPDATED: Display logo from ENV -->
-      <!-- <img
+      <img
         :src="brandLogo"
         :alt="globalConfig.installationName"
         class="block w-auto h-12 mx-auto"
       />
-       -->
+      
 
       <!-- UPDATED: Display title from ENV -->
       <h2 class="mt-6 text-3xl font-medium text-center text-n-slate-12">

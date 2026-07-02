@@ -31,9 +31,9 @@ export default {
     CONDENSED: 'condensed',
     EXPANDED: 'expanded',
   },
-  DOCS_URL: 'https://www.theagentive.ai',
-  HELP_CENTER_DOCS_URL: 'https://www.theagentive.ai',
-  TESTIMONIAL_URL: 'https://www.theagentive.ai',
+  DOCS_URL: 'https://www.kodexolabs.com',
+  HELP_CENTER_DOCS_URL: 'https://www.kodexolabs.com',
+  TESTIMONIAL_URL: 'https://www.kodexolabs.com',
   WHATSAPP_EMBEDDED_SIGNUP_DOCS_URL:
     'https://developers.facebook.com/docs/whatsapp/embedded-signup/custom-flows/onboarding-business-app-users#limitations',
   SMALL_SCREEN_BREAKPOINT: 768,
