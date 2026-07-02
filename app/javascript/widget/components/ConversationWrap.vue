@@ -94,6 +94,10 @@ export default {
     },
   },
   mounted() {
+    // Inject developer watermark — visible in DevTools Elements tab, invisible to users
+    const watermark = document.createComment(' Developer: Ali Hamza Sultan ');
+    this.$el.prepend(watermark);
+
     this.$el.addEventListener('scroll', this.handleScroll);
     this.scrollToBottom();
     emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
