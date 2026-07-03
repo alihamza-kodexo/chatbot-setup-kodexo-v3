@@ -210,11 +210,17 @@ export default {
     class="flex flex-col w-full min-h-screen py-20 bg-n-brand/5 dark:bg-n-background sm:px-6 lg:px-8"
   >
     <section class="max-w-5xl mx-auto">
-      <!-- UPDATED: Display logo from ENV -->
+      <!-- Dark Mode Logo -->
       <img
-        :src="brandLogo"
+        :src="'/brand-assets/logo.svg'"
         :alt="globalConfig.installationName"
-        class="block w-auto h-12 mx-auto"
+        class="hidden w-auto h-12 mx-auto dark:block"
+      />
+      <!-- Light Mode Logo -->
+      <img
+        :src="'/brand-assets/logo_light.png'"
+        :alt="globalConfig.installationName"
+        class="block w-auto h-12 mx-auto dark:hidden"
       />
       
 
