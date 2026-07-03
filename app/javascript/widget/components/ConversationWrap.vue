@@ -353,9 +353,9 @@ export default {
     askGoodbye() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'text',
-        text: 'Thank you! A farewell message. The chat is open below if you ever need anything else.',
+        text: "Thank you! We've received your request and our team will be in touch shortly.",
       });
-      emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
+      // Chat input is permanently disabled as requested
     },
 
     async onOptionSelect(option, messageIndex) {

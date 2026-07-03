@@ -55,7 +55,7 @@ export default {
       shouldShowEmojiPicker: 'appConfig/getShouldShowEmojiPicker',
     }),
     showAttachment() {
-      return this.canHandleAttachments && this.userInput.length === 0;
+      return false; // Permanently disabled for custom bot flow
     },
     showSendButton() {
       return this.userInput.length > 0;
