@@ -33,6 +33,7 @@ export default {
       previousConversationSize: 0,
       waitingForFreeInput: false,
       currentInputStep: null,
+      isBotTyping: false,
       flowState: {},
       flowMessages: [
         {
@@ -72,9 +73,10 @@ export default {
       const { status } = this.conversationAttributes;
       const isConversationInPendingStatus = status === 'pending';
       const isLastMessageIncoming =
-        this.lastMessage.message_type === MESSAGE_TYPE.INCOMING;
+        this.lastMessage && this.lastMessage.message_type === MESSAGE_TYPE.INCOMING;
       return (
         this.isAgentTyping ||
+        this.isBotTyping ||
         (isConversationInPendingStatus && isLastMessageIncoming)
       );
     },
@@ -83,14 +85,17 @@ export default {
     allMessagesLoaded() {
       this.previousScrollHeight = 0;
     },
-    flowMessages() {
-      this.$nextTick(() => {
-        // Use a small delay so the browser finishes painting variable-height
-        // button lists before we scroll, otherwise the scroll target is wrong.
-        setTimeout(() => {
-          this.scrollToBottom();
-        }, 150);
-      });
+    flowMessages: {
+      deep: true,
+      handler() {
+        this.$nextTick(() => {
+          // Use a small delay so the browser finishes painting variable-height
+          // button lists before we scroll, otherwise the scroll target is wrong.
+          setTimeout(() => {
+            this.scrollToBottom();
+          }, 150);
+        });
+      },
     },
   },
   mounted() {
@@ -142,14 +147,29 @@ export default {
       
       this.flowState[this.currentInputStep] = content;
 
+      // Add the user's typed message visually to the custom flow
+      this.flowMessages.push({
+        id: Date.now(),
+        sender: 'user',
+        type: 'text',
+        text: content,
+      });
+
+      this.isBotTyping = true;
+      this.scrollToBottom();
+
       setTimeout(() => {
+        this.isBotTyping = false;
         if (this.currentInputStep === 'project_brief') {
           this.askTimeline();
         } else if (this.currentInputStep === 'name') {
+          this.$store.dispatch('contacts/update', { user: { name: content } }).catch(() => {});
           this.askEmail();
         } else if (this.currentInputStep === 'email') {
+          this.$store.dispatch('contacts/update', { user: { email: content } }).catch(() => {});
           this.askPhone();
         } else if (this.currentInputStep === 'phone') {
+          this.$store.dispatch('contacts/update', { user: { phone_number: content } }).catch(() => {});
           this.askReferralSource();
         }
         this.scrollToBottom();
@@ -354,8 +374,12 @@ export default {
       // Send selection to backend so admin sees it
       await this.sendMessage({ content: option.title });
 
+      this.isBotTyping = true;
+      this.scrollToBottom();
+
       // Route to next step
       setTimeout(() => {
+        this.isBotTyping = false;
         if (['quote', 'project', 'portfolio', 'services', 'exploring', 'any_of_the_above'].includes(option.id)) {
           this.flowState['user_intent'] = option.title;
           this.askServiceSelector();
@@ -410,19 +434,20 @@ export default {
           v-for="message in groupedMessage.messages"
           :key="message.id"
           :message="message"
+          :class="{ 'hidden': message.content_type === 'input_email' }"
         />
       </div>
 
       <!-- Test Flow Messages -->
-      <div class="mt-4 space-y-3 px-2">
+      <transition-group name="message-fade" tag="div" class="mt-4 space-y-3 px-2">
         <div v-for="(msg, index) in flowMessages" :key="msg.id">
           <!-- User Message -->
           <div
             v-if="msg.sender === 'user'"
             class="items-end flex justify-end ml-auto mb-1 mt-0 max-w-[85%] text-right"
           >
-            <div class="rounded-[1.25rem] rounded-br-[0.25rem] text-white dark:text-white text-sm px-4 py-2.5" style="background: var(--color-woot)">
-              <p class="m-0 text-left">
+            <div class="text-n-slate-12 dark:text-white text-sm px-4 py-2.5">
+              <p class="m-0 text-right font-medium">
                 {{ msg.text }}
               </p>
             </div>
@@ -433,7 +458,7 @@ export default {
             <!-- Text Bubble -->
             <div
               v-if="msg.type === 'text'"
-              class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-n-slate-12 bg-n-background dark:bg-n-solid-3"
+              class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-white bg-[#0A0A0F] w-fit"
             >
               <p class="m-0">
                 {{ msg.text }}
@@ -443,19 +468,19 @@ export default {
             <!-- Options Bubble -->
             <div v-else-if="msg.type === 'options'" class="w-full">
               <div
-                class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-n-slate-12 bg-n-background dark:bg-n-solid-3 w-full"
+                class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-white bg-[#0A0A0F] w-full"
               >
-                <h4 class="text-n-slate-12 text-sm font-normal my-1 leading-[1.5]">
+                <h4 class="text-white text-sm font-normal my-1 leading-[1.5]">
                   {{ msg.title }}
                 </h4>
                 <ul v-if="!msg.hideFields" class="flex flex-wrap gap-2 mt-2 w-full p-0 m-0">
                   <li
                     v-for="option in msg.options"
                     :key="option.id"
-                    class="list-none rounded-[5rem] border border-solid m-0 max-w-full hover:bg-n-slate-2 dark:hover:bg-n-solid-2 transition-colors border-[#002f49]"
+                    class="list-none rounded-[5rem] border border-solid m-0 max-w-full hover:bg-[#F54545] transition-colors border-[#F54545] group"
                   >
                     <button
-                      class="bg-transparent border-0 cursor-pointer px-4 py-1.5 text-xs leading-normal rounded-[2rem] font-medium text-[#002f49]"
+                      class="bg-transparent border-0 cursor-pointer px-4 py-1.5 text-xs leading-normal rounded-[2rem] font-medium text-[#F54545] group-hover:text-white"
                       @click="onOptionSelect(option, index)"
                     >
                       <span>{{ option.title }}</span>
@@ -466,7 +491,7 @@ export default {
             </div>
           </div>
         </div>
-      </div>
+      </transition-group>
 
       <AgentTypingBubble v-if="showStatusIndicator" />
     </div>
@@ -497,5 +522,15 @@ export default {
 
 .message--loader {
   text-align: center;
+}
+
+.message-fade-enter-active,
+.message-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.message-fade-enter-from,
+.message-fade-leave-to {
+  opacity: 0;
+  transform: translateY(15px) scale(0.98);
 }
 </style>
