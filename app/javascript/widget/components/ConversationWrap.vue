@@ -221,7 +221,7 @@ export default {
     askProjectBrief() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'text',
-        text: 'Tell me briefly about your project or...',
+        text: 'Tell me briefly about your project by typing below.',
       });
       this.currentInputStep = 'project_brief';
       this.waitingForFreeInput = true;
