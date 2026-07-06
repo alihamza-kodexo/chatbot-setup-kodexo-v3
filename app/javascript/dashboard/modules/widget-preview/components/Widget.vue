@@ -31,10 +31,6 @@ export default {
       type: String,
       default: '',
     },
-    widgetIcon: {
-      type: String,
-      default: '',
-    },
     isOnline: {
       type: Boolean,
       default: true,
@@ -189,14 +185,7 @@ export default {
         @click="toggleWidget"
       >
         <img
-          v-if="!isWidgetVisible && widgetIcon"
-          :src="widgetIcon"
-          alt=""
-          draggable="false"
-          class="w-6 h-6 mx-auto object-contain"
-        />
-        <img
-          v-if="!isWidgetVisible && !widgetIcon"
+          v-if="!isWidgetVisible"
           src="~dashboard/assets/images/bubble-logo.svg"
           alt=""
           draggable="false"

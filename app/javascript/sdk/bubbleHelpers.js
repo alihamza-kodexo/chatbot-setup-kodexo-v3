@@ -27,17 +27,26 @@ export const setBubbleText = bubbleText => {
 
 export const createBubbleIcon = ({ className, path, target }) => {
   let bubbleClassName = `${className} woot-elements--${window.$chatwoot.position}`;
-  const bubbleImg = document.createElement('img');
-  bubbleImg.id = 'woot-widget-bubble-icon';
-  bubbleImg.src = window.$chatwoot.widgetIconUrl || `${window.$chatwoot.baseUrl}/favicon-32x32.png`;
-  
-  // Apply the same styles as the old SVG to ensure it sits perfectly in the center
-  bubbleImg.style.width = '30px';
-  bubbleImg.style.height = '30px';
-  bubbleImg.style.margin = '17px';
-  bubbleImg.style.objectFit = 'contain';
+  const bubbleIcon = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'svg'
+  );
+  bubbleIcon.setAttributeNS(null, 'id', 'woot-widget-bubble-icon');
+  bubbleIcon.setAttributeNS(null, 'width', '24');
+  bubbleIcon.setAttributeNS(null, 'height', '24');
+  bubbleIcon.setAttributeNS(null, 'viewBox', '0 0 240 240');
+  bubbleIcon.setAttributeNS(null, 'fill', 'none');
+  bubbleIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
-  target.appendChild(bubbleImg);
+  const bubblePath = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'path'
+  );
+  bubblePath.setAttributeNS(null, 'd', path);
+  bubblePath.setAttributeNS(null, 'fill', '#FFFFFF');
+
+  bubbleIcon.appendChild(bubblePath);
+  target.appendChild(bubbleIcon);
 
   if (isExpandedView(window.$chatwoot.type)) {
     const textNode = document.createElement('div');

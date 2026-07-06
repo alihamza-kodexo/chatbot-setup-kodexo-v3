@@ -31,7 +31,7 @@ class Channel::WebWidget < ApplicationRecord
   include FlagShihTzu
 
   self.table_name = 'channel_web_widgets'
-  EDITABLE_ATTRS = [:website_url, :widget_color, :widget_icon, :welcome_title, :welcome_tagline, :reply_time, :pre_chat_form_enabled,
+  EDITABLE_ATTRS = [:website_url, :widget_color, :welcome_title, :welcome_tagline, :reply_time, :pre_chat_form_enabled,
                     :continuity_via_email, :hmac_mandatory, :allowed_domains,
                     { pre_chat_form_options: [:pre_chat_message, :require_email,
                                               { pre_chat_fields:
@@ -47,8 +47,6 @@ class Channel::WebWidget < ApplicationRecord
   has_secure_token :website_token
   has_secure_token :hmac_token
 
-  has_one_attached :widget_icon
-
   has_flags 1 => :attachments,
             2 => :emoji_picker,
             3 => :end_conversation,
@@ -60,12 +58,6 @@ class Channel::WebWidget < ApplicationRecord
 
   def name
     'Website'
-  end
-
-  def widget_icon_url
-    return '' unless widget_icon.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_url(widget_icon)
   end
 
   def web_widget_script
