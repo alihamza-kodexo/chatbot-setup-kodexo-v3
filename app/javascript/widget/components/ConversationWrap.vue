@@ -35,25 +35,7 @@ export default {
       currentInputStep: null,
       isBotTyping: false,
       flowState: {},
-      flowMessages: [
-        {
-          id: Date.now(),
-          sender: 'agent',
-          type: 'options',
-          title: 'Hello and welcome to Kodexo Labs! 👋\nHow can I help you today?',
-          options: [
-            { id: 'quote', title: 'I need a quote' },
-            { id: 'project', title: 'Discuss my Project' },
-            { id: 'portfolio', title: 'Learn about your Portfolio' },
-            { id: 'services', title: 'Learn about your Service' },
-            { id: 'consultation', title: 'Book a Free Consultation' },
-            { id: 'contact', title: 'Contact and Location Info' },
-            { id: 'exploring', title: 'Just exploring' },
-            { id: 'any_of_the_above', title: 'Any of the above' }
-          ],
-          hideFields: false,
-        },
-      ],
+      flowMessages: [],
     };
   },
   computed: {
@@ -104,6 +86,7 @@ export default {
     this.$el.prepend(watermark);
 
     this.$el.addEventListener('scroll', this.handleScroll);
+    this.askInitialIntent();
     this.scrollToBottom();
     emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
     emitter.on(BUS_EVENTS.MESSAGE_SENT, this.onFreeInputReceived);
@@ -183,6 +166,25 @@ export default {
     },
     
     // --- HELPER METHODS FOR FLOW STEPS --- //
+    askInitialIntent() {
+      this.flowMessages.push({
+        id: Date.now(),
+        sender: 'agent',
+        type: 'options',
+        title: 'Hello and welcome to Kodexo Labs! 👋\nHow can I help you today?',
+        options: [
+          { id: 'quote', title: 'I need a quote' },
+          { id: 'project', title: 'Discuss my Project' },
+          { id: 'portfolio', title: 'Learn about your Portfolio' },
+          { id: 'services', title: 'Learn about your Service' },
+          { id: 'consultation', title: 'Book a Free Consultation' },
+          { id: 'contact', title: 'Contact and Location Info' },
+          { id: 'exploring', title: 'Just exploring' },
+          { id: 'any_of_the_above', title: 'Any of the above' }
+        ],
+        hideFields: false,
+      });
+    },
     askServiceSelector() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'options',
@@ -358,8 +360,12 @@ export default {
       this.sendMessage({ content: summary });
 
       this.flowMessages.push({
-        id: Date.now(), sender: 'agent', type: 'text',
-        text: "Thank you! We've received your request and our team will be in touch shortly.",
+        id: Date.now(), sender: 'agent', type: 'options',
+        title: "Thank you! We've received your request and our team will be in touch shortly.",
+        options: [
+          { id: 'start_over', action: 'start_over', title: 'Start Over' }
+        ],
+        hideFields: false,
       });
       // Chat input is permanently disabled as requested
     },
@@ -411,6 +417,10 @@ export default {
         } else if (option.action === 'final_action' || option.id === 'book_call_now') {
           this.submitToHubspot();
           this.askGoodbye();
+        } else if (option.action === 'start_over') {
+          this.flowState = {};
+          window.isCustomBotFlowActive = true;
+          this.askInitialIntent();
         }
         
         this.scrollToBottom();
