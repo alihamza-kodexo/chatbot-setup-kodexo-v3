@@ -171,7 +171,8 @@ export default {
         if (this.currentInputStep === 'project_brief') {
           this.askTimeline();
         } else if (this.currentInputStep === 'email') {
-          this.$store.dispatch('contacts/update', { user: { email: content } }).catch(() => {});
+          const emailName = content.split('@')[0];
+          this.$store.dispatch('contacts/update', { user: { email: content, name: emailName } }).catch(() => {});
           this.askPhone();
         } else if (this.currentInputStep === 'phone') {
           this.$store.dispatch('contacts/update', { user: { phone_number: content } }).catch(() => {});
