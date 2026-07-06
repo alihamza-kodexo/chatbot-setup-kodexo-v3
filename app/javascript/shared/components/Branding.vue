@@ -3,7 +3,7 @@ import { useBranding } from 'shared/composables/useBranding';
 
 // Mapping Environment Variables
 const BRAND_NAME = import.meta.env.VITE_BRAND_NAME || '';
-const LOGO_THUMBNAIL = import.meta.env.VITE_BRAND_LOGO_THUMBNAIL || '';
+const LOGO_THUMBNAIL = import.meta.env.VITE_BRAND_LOGO_THUMBNAIL || '/favicon-32x32.png';
 const WIDGET_BRAND_URL = import.meta.env.VITE_BRAND_URL || '';
 const POWERED_BY_TEXT = import.meta.env.VITE_BRAND_POWERED_BY || 'Powered by';
 
