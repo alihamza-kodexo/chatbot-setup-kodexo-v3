@@ -99,6 +99,7 @@ export default {
     },
   },
   mounted() {
+    window.isCustomBotFlowActive = true;
     const watermark = document.createComment(' Developer: Ali Hamza Sultan ');
     this.$el.prepend(watermark);
 
@@ -115,10 +116,12 @@ export default {
       // If the widget loads and we fetch an existing conversation history, hide the custom flow
       if (this.conversationSize > 0 && !this.flowState['user_intent']) {
         this.flowMessages = [];
+        window.isCustomBotFlowActive = false;
       }
     }
   },
   unmounted() {
+    window.isCustomBotFlowActive = false;
     this.$el.removeEventListener('scroll', this.handleScroll);
     emitter.off(BUS_EVENTS.MESSAGE_SENT, this.onFreeInputReceived);
     emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
@@ -342,6 +345,17 @@ export default {
       }
     },
     askGoodbye() {
+      const summary = `Lead Collected:
+- Intent: ${this.flowState['user_intent'] || 'N/A'}
+- Service: ${this.flowState['project_type'] || 'N/A'}
+- Brief: ${this.flowState['project_brief'] || 'N/A'}
+- Timeline: ${this.flowState['timeline'] || 'N/A'}
+- Budget: ${this.flowState['budget_range'] || 'N/A'}
+- Email: ${this.flowState['email'] || 'N/A'}`;
+      
+      window.isCustomBotFlowActive = false;
+      this.sendMessage({ content: summary });
+
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'text',
         text: "Thank you! We've received your request and our team will be in touch shortly.",
@@ -361,9 +375,6 @@ export default {
         type: 'text',
         text: option.title,
       });
-
-      // Send selection to backend so admin sees it
-      await this.sendMessage({ content: option.title });
 
       this.isBotTyping = true;
       this.scrollToBottom();

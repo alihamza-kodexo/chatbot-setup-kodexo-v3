@@ -70,6 +70,13 @@ export default {
       this.isFlowInputHidden = false;
     },
     async handleSendMessage(content) {
+      if (window.isCustomBotFlowActive) {
+        // Only emit event for custom bot flow to process, do not send to backend
+        emitter.emit(BUS_EVENTS.MESSAGE_SENT, { content });
+        this.inReplyTo = null;
+        return;
+      }
+
       await this.sendMessage({
         content,
         replyTo: this.inReplyTo ? this.inReplyTo.id : null,
