@@ -111,6 +111,11 @@ export default {
     if (this.previousConversationSize !== this.conversationSize) {
       this.previousConversationSize = this.conversationSize;
       this.scrollToBottom();
+      
+      // If the widget loads and we fetch an existing conversation history, hide the custom flow
+      if (this.conversationSize > 0 && !this.flowState['user_intent']) {
+        this.flowMessages = [];
+      }
     }
   },
   unmounted() {
@@ -162,9 +167,6 @@ export default {
         this.isBotTyping = false;
         if (this.currentInputStep === 'project_brief') {
           this.askTimeline();
-        } else if (this.currentInputStep === 'name') {
-          this.$store.dispatch('contacts/update', { user: { name: content } }).catch(() => {});
-          this.askEmail();
         } else if (this.currentInputStep === 'email') {
           this.$store.dispatch('contacts/update', { user: { email: content } }).catch(() => {});
           this.askPhone();
@@ -257,20 +259,10 @@ export default {
         hideFields: false,
       });
     },
-    askName() {
-      this.flowMessages.push({
-        id: Date.now(), sender: 'agent', type: 'text',
-        text: 'Perfect! How should we reach you?... (Please enter your name)',
-      });
-      this.currentInputStep = 'name';
-      this.waitingForFreeInput = true;
-      emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
-    },
     askEmail() {
-      const name = this.flowState['name'] || '';
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'text',
-        text: `Nice to meet you, ${name}! What's your email address?`,
+        text: "Perfect! What's your email address?",
       });
       this.currentInputStep = 'email';
       this.waitingForFreeInput = true;
@@ -302,10 +294,9 @@ export default {
       });
     },
     askFinalConfirmation() {
-      const name = this.flowState['name'] || '';
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'options',
-        title: `Thanks ${name}! 🎉\nOur team will review your project and get back to you within 24 hours.\nWant to skip the wait? Book a call directly with our team:`,
+        title: `Thanks! 🎉\nOur team will review your project and get back to you within 24 hours.\nWant to skip the wait? Book a call directly with our team:`,
         options: [
           { id: 'schedule_call', action: 'final_action', title: 'Schedule a Call Now' },
           { id: 'wait_email', action: 'final_action', title: "I'll wait for your email" },
@@ -401,7 +392,7 @@ export default {
           this.askBudget();
         } else if (option.action === 'budget_selected') {
           this.flowState['budget_range'] = option.title;
-          this.askName();
+          this.askEmail();
         } else if (option.action === 'referral_selected') {
           this.flowState['lead_source'] = option.title;
           this.askFinalConfirmation();
