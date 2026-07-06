@@ -38,6 +38,8 @@ export default {
       replyTime: 'in_a_few_minutes',
       avatarFile: null,
       avatarUrl: '',
+      widgetIconFile: null,
+      widgetIconUrl: '',
       widgetBubblePosition: 'right',
       widgetBubbleLauncherTitle: this.$t(
         'INBOX_MGMT.WIDGET_BUILDER.WIDGET_OPTIONS.WIDGET_BUBBLE_LAUNCHER_TITLE.DEFAULT'
@@ -164,6 +166,7 @@ export default {
         widget_color,
         reply_time,
         avatar_url,
+        widget_icon_url,
       } = this.inbox;
       this.websiteName = name;
       this.welcomeHeading = welcome_title;
@@ -171,6 +174,7 @@ export default {
       this.color = widget_color;
       this.replyTime = reply_time;
       this.avatarUrl = avatar_url;
+      this.widgetIconUrl = widget_icon_url;
 
       const savedInformation = this.getSavedInboxInformation();
       if (savedInformation) {
@@ -205,6 +209,10 @@ export default {
       this.avatarFile = file;
       this.avatarUrl = url;
     },
+    handleWidgetIconUpload({ file, url }) {
+      this.widgetIconFile = file;
+      this.widgetIconUrl = url;
+    },
     async handleAvatarDelete() {
       try {
         await this.$store.dispatch('inboxes/deleteInboxAvatar', this.inbox.id);
@@ -224,6 +232,12 @@ export default {
               )
         );
       }
+    },
+    handleWidgetIconDelete() {
+      // In this specific implementation, we just clear it from UI before update
+      // For real deletion, we could add a new API endpoint, but clearing on update works for now.
+      this.widgetIconFile = '';
+      this.widgetIconUrl = '';
     },
     async updateWidget() {
       const bubbleSettings = {
@@ -247,6 +261,9 @@ export default {
         };
         if (this.avatarFile) {
           payload.avatar = this.avatarFile;
+        }
+        if (this.widgetIconFile !== null) {
+          payload.channel.widget_icon = this.widgetIconFile;
         }
         await this.$store.dispatch('inboxes/updateInbox', payload);
         useAlert(
@@ -291,6 +308,21 @@ export default {
                 rounded-full
                 @upload="handleImageUpload"
                 @delete="handleAvatarDelete"
+              />
+            </div>
+            <div class="flex flex-col mb-4 items-start gap-1 w-full">
+              <label class="mb-0.5 text-sm font-medium text-n-slate-12">
+                Widget Launcher Icon
+              </label>
+              <Avatar
+                :src="widgetIconUrl"
+                :size="72"
+                icon-name="i-ri-global-fill"
+                name=""
+                allow-upload
+                rounded-full
+                @upload="handleWidgetIconUpload"
+                @delete="handleWidgetIconDelete"
               />
             </div>
             <woot-input
@@ -423,6 +455,7 @@ export default {
             :welcome-tagline="welcomeTagline"
             :website-name="websiteName"
             :logo="avatarUrl"
+            :widget-icon="widgetIconUrl"
             is-online
             :reply-time="replyTime"
             :color="color"

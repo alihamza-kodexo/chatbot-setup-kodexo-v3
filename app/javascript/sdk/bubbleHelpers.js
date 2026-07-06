@@ -29,7 +29,7 @@ export const createBubbleIcon = ({ className, path, target }) => {
   let bubbleClassName = `${className} woot-elements--${window.$chatwoot.position}`;
   const bubbleImg = document.createElement('img');
   bubbleImg.id = 'woot-widget-bubble-icon';
-  bubbleImg.src = `${window.$chatwoot.baseUrl}/favicon-32x32.png`;
+  bubbleImg.src = window.$chatwoot.widgetIconUrl || `${window.$chatwoot.baseUrl}/favicon-32x32.png`;
   
   // Apply the same styles as the old SVG to ensure it sits perfectly in the center
   bubbleImg.style.width = '30px';
