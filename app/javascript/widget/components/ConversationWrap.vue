@@ -34,6 +34,7 @@ export default {
       waitingForFreeInput: false,
       currentInputStep: null,
       isBotTyping: false,
+      hasHandledInitialLoad: false,
       flowState: {},
       flowMessages: [],
     };
@@ -64,6 +65,17 @@ export default {
     },
   },
   watch: {
+    isFetchingList(fetching) {
+      if (!fetching && !this.hasHandledInitialLoad) {
+        this.hasHandledInitialLoad = true;
+        if (this.conversationSize === 0) {
+          this.askInitialIntent();
+        } else {
+          this.showStartOverButton();
+        }
+        this.$nextTick(() => { this.scrollToBottom(); });
+      }
+    },
     allMessagesLoaded() {
       this.previousScrollHeight = 0;
     },
@@ -86,7 +98,16 @@ export default {
     this.$el.prepend(watermark);
 
     this.$el.addEventListener('scroll', this.handleScroll);
-    this.askInitialIntent();
+    
+    if (!this.isFetchingList) {
+      this.hasHandledInitialLoad = true;
+      if (this.conversationSize === 0) {
+        this.askInitialIntent();
+      } else {
+        this.showStartOverButton();
+      }
+    }
+    
     this.scrollToBottom();
     emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
     emitter.on(BUS_EVENTS.MESSAGE_SENT, this.onFreeInputReceived);
@@ -95,12 +116,6 @@ export default {
     if (this.previousConversationSize !== this.conversationSize) {
       this.previousConversationSize = this.conversationSize;
       this.scrollToBottom();
-      
-      // If the widget loads and we fetch an existing conversation history, hide the custom flow
-      if (this.conversationSize > 0 && !this.flowState['user_intent']) {
-        this.flowMessages = [];
-        window.isCustomBotFlowActive = false;
-      }
     }
   },
   unmounted() {
@@ -166,6 +181,19 @@ export default {
     },
     
     // --- HELPER METHODS FOR FLOW STEPS --- //
+    showStartOverButton() {
+      window.isCustomBotFlowActive = false;
+      this.flowMessages = [{
+        id: Date.now(),
+        sender: 'agent',
+        type: 'options',
+        title: "Submit a new inquiry?",
+        options: [
+          { id: 'start_over', action: 'start_over', title: 'Start Over' }
+        ],
+        hideFields: false,
+      }];
+    },
     askInitialIntent() {
       this.flowMessages.push({
         id: Date.now(),
