@@ -499,7 +499,7 @@ export default {
             <!-- Text Bubble -->
             <div
               v-if="msg.type === 'text'"
-              class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-white bg-[#0A0A0F] w-fit"
+              class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-[#1f2937] bg-white w-fit"
             >
               <p class="m-0">
                 {{ msg.text }}
@@ -509,9 +509,9 @@ export default {
             <!-- Options Bubble -->
             <div v-else-if="msg.type === 'options'" class="w-full">
               <div
-                class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-white bg-[#0A0A0F] w-full"
+                class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-[#1f2937] bg-white w-full"
               >
-                <h4 class="text-white text-sm font-normal my-1 leading-[1.5]">
+                <h4 class="text-[#1f2937] text-sm font-normal my-1 leading-[1.5]">
                   {{ msg.title }}
                 </h4>
                 <ul v-if="!msg.hideFields" class="flex flex-wrap gap-2 mt-2 w-full p-0 m-0">
