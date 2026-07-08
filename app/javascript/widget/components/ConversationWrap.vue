@@ -332,7 +332,7 @@ export default {
         id: Date.now(), sender: 'agent', type: 'options',
         title: `Thanks! 🎉\nOur team will review your project and get back to you within 24 hours.\nWant to skip the wait? Book a call directly with our team:`,
         options: [
-          { id: 'schedule_call', action: 'final_action', title: 'Schedule a Call Now' },
+          { id: 'schedule_call', action: 'book_meeting', title: 'Schedule a Call Now' },
           { id: 'wait_email', action: 'final_action', title: "I'll wait for your email" },
           { id: 'any_final', action: 'final_action', title: 'Any of the above' }
         ],
@@ -442,7 +442,11 @@ export default {
         } else if (option.action === 'referral_selected') {
           this.flowState['lead_source'] = option.title;
           this.askFinalConfirmation();
-        } else if (option.action === 'final_action' || option.id === 'book_call_now') {
+        } else if (option.action === 'book_meeting' || option.id === 'book_call_now') {
+          this.submitToHubspot();
+          window.open('https://meetings-na2.hubspot.com/kodexo', '_blank');
+          this.askGoodbye();
+        } else if (option.action === 'final_action') {
           this.submitToHubspot();
           this.askGoodbye();
         } else if (option.action === 'start_over') {
