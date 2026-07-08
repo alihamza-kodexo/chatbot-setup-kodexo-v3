@@ -9,6 +9,7 @@ import { mapActions, mapGetters } from 'vuex';
 import { BUS_EVENTS } from 'shared/constants/busEvents';
 import { emitter } from 'shared/helpers/mitt';
 import { setPriorityAPI } from 'widget/api/conversation';
+import { createTemporaryMessage } from 'widget/store/modules/conversation/helpers';
 
 export default {
   name: 'ConversationWrap',
@@ -38,6 +39,8 @@ export default {
       hasHandledInitialLoad: false,
       flowState: {},
       flowMessages: [],
+      isCustomBotFlowActive: true,
+      isWaitingForValidation: false,
     };
   },
   computed: {
@@ -84,17 +87,43 @@ export default {
       deep: true,
       handler() {
         this.$nextTick(() => {
-          // Use a small delay so the browser finishes painting variable-height
-          // button lists before we scroll, otherwise the scroll target is wrong.
           setTimeout(() => {
             this.scrollToBottom();
           }, 150);
         });
       },
     },
+    lastMessage: {
+      deep: true,
+      handler(newMsg) {
+        if (!newMsg) return;
+        
+        // 1 = incoming from agent/bot
+        if (this.isWaitingForValidation && newMsg.message_type === 1) {
+          if (newMsg.content && newMsg.content.includes('[SYSTEM_VALID]')) {
+            this.isWaitingForValidation = false;
+            this.proceedToNextStep();
+          } else if (newMsg.content && newMsg.content.includes('[SYSTEM_INVALID]')) {
+            this.isWaitingForValidation = false;
+            const errorMsg = newMsg.content.replace('[SYSTEM_INVALID]', '').trim();
+            this.flowMessages.push({
+              id: Date.now(),
+              sender: 'agent',
+              type: 'text',
+              text: errorMsg || 'Please provide a valid answer.',
+            });
+            // Re-enable chat input for retry
+            this.waitingForFreeInput = true;
+            emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
+            this.scrollToBottom();
+          }
+        }
+      }
+    }
   },
   mounted() {
     window.isCustomBotFlowActive = true;
+    this.isCustomBotFlowActive = true;
     const watermark = document.createComment(' Developer: Ali Hamza Sultan ');
     this.$el.prepend(watermark);
 
@@ -103,6 +132,9 @@ export default {
     if (!this.isFetchingList) {
       this.hasHandledInitialLoad = true;
       if (this.conversationSize === 0) {
+        // Send a hidden trigger message to create the conversation in the backend immediately
+        const initMessage = createTemporaryMessage({ content: '[SYSTEM_INIT] User started flow' });
+        this.sendMessageWithData(initMessage).catch(() => {});
         this.askInitialIntent();
       } else {
         this.showStartOverButton();
@@ -147,7 +179,7 @@ export default {
       }
     },
     // Called when user types freely
-    onFreeInputReceived({ content }) {
+    async onFreeInputReceived({ content }) {
       if (!this.waitingForFreeInput) return;
       this.waitingForFreeInput = false;
       emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
@@ -165,20 +197,35 @@ export default {
       this.isBotTyping = true;
       this.scrollToBottom();
 
-      setTimeout(() => {
-        this.isBotTyping = false;
-        if (this.currentInputStep === 'project_brief') {
-          this.askTimeline();
-        } else if (this.currentInputStep === 'email') {
-          const emailName = content.split('@')[0];
-          this.$store.dispatch('contacts/update', { user: { email: content, name: emailName } }).catch(() => {});
-          this.askPhone();
-        } else if (this.currentInputStep === 'phone') {
-          this.$store.dispatch('contacts/update', { user: { phone_number: content } }).catch(() => {});
-          this.askReferralSource();
-        }
-        this.scrollToBottom();
-      }, 600);
+      // Send to Chatwoot backend to trigger webhooks
+      const tempMessage = createTemporaryMessage({ content: content });
+      
+      try {
+        this.isWaitingForValidation = true;
+        await this.sendMessageWithData(tempMessage);
+      } catch (e) {
+        // Fallback if API fails
+        this.isWaitingForValidation = false;
+        this.proceedToNextStep();
+      }
+    },
+    
+    // Extracted logic to proceed to the next step
+    proceedToNextStep() {
+      this.isBotTyping = false;
+      if (this.currentInputStep === 'project_brief') {
+        this.askTimeline();
+      } else if (this.currentInputStep === 'email') {
+        const content = this.flowState['email'];
+        const emailName = content.split('@')[0];
+        this.$store.dispatch('contacts/update', { user: { email: content, name: emailName } }).catch(() => {});
+        this.askPhone();
+      } else if (this.currentInputStep === 'phone') {
+        const content = this.flowState['phone'];
+        this.$store.dispatch('contacts/update', { user: { phone_number: content } }).catch(() => {});
+        this.askReferralSource();
+      }
+      this.scrollToBottom();
     },
     
     // --- HELPER METHODS FOR FLOW STEPS --- //
@@ -195,6 +242,7 @@ export default {
     },
     showStartOverButton() {
       window.isCustomBotFlowActive = false;
+      this.isCustomBotFlowActive = false;
       this.flowMessages = [{
         id: Date.now(),
         sender: 'agent',
@@ -258,7 +306,23 @@ export default {
     askContactInfo() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'options',
-        title: "Here's how to reach us!\n📞 Phone: +1 219 766 5259\n✉️ Email: contact@kodexolabs.com\n\nUSA locations shown: Austin, New York, San Francisco, Chicago.\nUK location shown: London.\nPakistan location shown: Karachi.\n\nWe work with clients in all over the world! 🌎",
+        title: `Here's how to reach us!
+📞 Phone: +1 219 766 5259
+✉️ Email: contact@kodexolabs.com
+
+🇺🇸 USA:
+Austin: 316 W 12th St, 4th Floor, Austin, TX 78701
+New York: 211 E 43rd St, 7th Floor, New York, NY 10017
+San Francisco: 535 Mission St 14th floor, San Francisco, CA 94105, United States
+Chicago, IL: 110 N Wacker Dr, 25th Floor, Suite 2500, Chicago, IL 60606
+
+🇬🇧 UK:
+London: 27 Old Gloucester Street, London, WC1N 3AX
+
+🇵🇰 Pakistan:
+Karachi: B-145, Block 5 Gulshan-e-Iqbal, Karachi
+
+We work with clients in all over the world! 🌍`,
         options: [
           { id: 'discuss_project', title: 'Discuss My Project' },
           { id: 'any_of_the_above_contact', action: 'service_selected', title: 'Any of the above' }
@@ -397,14 +461,13 @@ export default {
 - Email: ${this.flowState['email'] || 'N/A'}`;
       
       window.isCustomBotFlowActive = false;
+      this.isCustomBotFlowActive = false;
 
-      // Use sendMessageWithData directly — it awaits the HTTP call,
-      // guaranteeing the conversation exists before we set the priority.
-      const { createTemporaryMessage } = await import('widget/store/modules/conversation/helpers');
+      // Send the final summary to chatwoot
       const tempMessage = createTemporaryMessage({ content: summary });
       await this.sendMessageWithData(tempMessage);
 
-      // Conversation is now committed — safely set the priority.
+      // Now the conversation exists — apply the stored priority.
       if (this.flowState['priority']) {
         setPriorityAPI(this.flowState['priority']).catch(() => {});
       }
@@ -502,7 +565,7 @@ export default {
           v-for="message in groupedMessage.messages"
           :key="message.id"
           :message="message"
-          :class="{ 'hidden': message.content_type === 'input_email' }"
+          :class="{ 'hidden': message.content_type === 'input_email' || isCustomBotFlowActive || message.content?.includes('[SYSTEM_') }"
         />
       </div>
 
