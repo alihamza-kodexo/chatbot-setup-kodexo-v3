@@ -206,15 +206,52 @@ export default {
         text: content,
       });
 
+      // Client-side validation for Email
+      if (this.currentInputStep === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(content.trim())) {
+          this.flowMessages.push({
+            id: Date.now() + 1, sender: 'agent', type: 'text',
+            text: 'Please enter a valid email address.',
+          });
+          this.waitingForFreeInput = true;
+          emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
+          this.scrollToBottom();
+          return;
+        }
+      }
+
+      // Client-side validation for Phone
+      if (this.currentInputStep === 'phone') {
+        const phoneRegex = /^\+?[0-9\s\-()]{7,15}$/;
+        if (!phoneRegex.test(content.trim())) {
+          this.flowMessages.push({
+            id: Date.now() + 1, sender: 'agent', type: 'text',
+            text: 'Please enter a valid phone number (e.g., +1 234 567 8900).',
+          });
+          this.waitingForFreeInput = true;
+          emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
+          this.scrollToBottom();
+          return;
+        }
+      }
+
       this.isBotTyping = true;
       this.scrollToBottom();
 
-      // Send to Chatwoot backend to trigger webhooks
+      // Send to Chatwoot backend for logging
       const tempMessage = createTemporaryMessage({ content: `[${this.currentInputStep}] ${content}` });
       
       try {
-        this.isWaitingForValidation = true;
-        await this.sendMessageWithData(tempMessage);
+        if (this.currentInputStep === 'project_brief') {
+          // Only wait for n8n AI validation on complex free-text fields
+          this.isWaitingForValidation = true;
+          await this.sendMessageWithData(tempMessage);
+        } else {
+          // Instantly proceed for fields validated client-side (email/phone)
+          this.sendMessageWithData(tempMessage).catch(() => {});
+          this.proceedToNextStep();
+        }
       } catch (e) {
         // Fallback if API fails
         this.isWaitingForValidation = false;
