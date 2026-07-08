@@ -198,7 +198,7 @@ export default {
       this.scrollToBottom();
 
       // Send to Chatwoot backend to trigger webhooks
-      const tempMessage = createTemporaryMessage({ content: content });
+      const tempMessage = createTemporaryMessage({ content: `[${this.currentInputStep}] ${content}` });
       
       try {
         this.isWaitingForValidation = true;
