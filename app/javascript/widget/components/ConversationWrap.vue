@@ -601,7 +601,7 @@ We work with clients in all over the world! 🌍`,
               <div
                 class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-[#1f2937] bg-white w-full"
               >
-                <h4 class="text-[#1f2937] text-sm font-normal my-1 leading-[1.5]">
+                <h4 class="text-[#1f2937] text-sm font-normal my-1 leading-[1.5] whitespace-pre-wrap">
                   {{ msg.title }}
                 </h4>
                 <ul v-if="!msg.hideFields" class="flex flex-wrap gap-2 mt-2 w-full p-0 m-0">
