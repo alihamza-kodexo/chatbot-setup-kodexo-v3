@@ -320,15 +320,22 @@ export const IFrameHelper = {
       closeBtnClassName += ' woot-widget-bubble-color--lighter';
     }
 
-    const chatIcon = createBubbleIcon({
-      className,
-      path: bubbleSVG,
-      target: chatBubble,
-    });
+    const chatIcon = chatBubble;
+    let bubbleClassName = `${className} woot-elements--${window.$chatwoot.position}`;
+    chatIcon.className = bubbleClassName;
+    chatIcon.title = 'Open chat window';
+
+    const logoImg = document.createElement('img');
+    logoImg.src = '/brand-assets/widget_logo.png';
+    logoImg.alt = 'Chat';
+    logoImg.style.cssText = 'width:44px;height:44px;object-fit:contain;display:block;';
+    chatIcon.appendChild(logoImg);
 
     addClasses(closeBubble, closeBtnClassName);
 
-    chatIcon.style.background = widgetColor;
+    chatIcon.style.background = 'transparent';
+    chatIcon.style.boxShadow = 'none';
+    chatIcon.style.padding = '0';
     closeBubble.style.background = widgetColor;
 
     bubbleHolder.appendChild(chatIcon);

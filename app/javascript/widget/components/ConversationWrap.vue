@@ -258,7 +258,7 @@ export default {
     askContactInfo() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'options',
-        title: "Here's how to reach us!\n📞 Phone: +1 210 764 2328\n✉️ Email: contact@kodexolabs.com\n\nUSA locations shown: Austin, New York, San Francisco, Chicago.\nUK location shown: London.\nPakistan location shown: Karachi.\n\nWe work with clients in all over the world! 🌎",
+        title: "Here's how to reach us!\n📞 Phone: +1 219 766 5259\n✉️ Email: contact@kodexolabs.com\n\nUSA locations shown: Austin, New York, San Francisco, Chicago.\nUK location shown: London.\nPakistan location shown: Karachi.\n\nWe work with clients in all over the world! 🌎",
         options: [
           { id: 'discuss_project', title: 'Discuss My Project' },
           { id: 'any_of_the_above_contact', action: 'service_selected', title: 'Any of the above' }
