@@ -126,7 +126,7 @@ export default {
     emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
   },
   methods: {
-    ...mapActions('conversation', ['fetchOldConversations', 'sendMessage']),
+    ...mapActions('conversation', ['fetchOldConversations', 'sendMessage', 'sendMessageWithData']),
     scrollToBottom() {
       const container = this.$el;
       container.scrollTop = container.scrollHeight - this.previousScrollHeight;
@@ -182,7 +182,7 @@ export default {
     },
     
     // --- HELPER METHODS FOR FLOW STEPS --- //
-    setPriorityFromTimeline(timelineTitle) {
+    getPriorityFromTimeline(timelineTitle) {
       const map = {
         'ASAP - We need this urgent': 'urgent',
         '1-3 months': 'high',
@@ -191,8 +191,7 @@ export default {
         'Flexible / Not sure yet': 'low',
         'Any of the above': 'medium',
       };
-      const priority = map[timelineTitle] || 'medium';
-      setPriorityAPI(priority).catch(() => {});
+      return map[timelineTitle] || 'medium';
     },
     showStartOverButton() {
       window.isCustomBotFlowActive = false;
@@ -388,7 +387,7 @@ export default {
         console.error('Error submitting to Hubspot:', error);
       }
     },
-    askGoodbye() {
+    async askGoodbye() {
       const summary = `Lead Collected:
 - Intent: ${this.flowState['user_intent'] || 'N/A'}
 - Service: ${this.flowState['project_type'] || 'N/A'}
@@ -398,7 +397,17 @@ export default {
 - Email: ${this.flowState['email'] || 'N/A'}`;
       
       window.isCustomBotFlowActive = false;
-      this.sendMessage({ content: summary });
+
+      // Use sendMessageWithData directly — it awaits the HTTP call,
+      // guaranteeing the conversation exists before we set the priority.
+      const { createTemporaryMessage } = await import('widget/store/modules/conversation/helpers');
+      const tempMessage = createTemporaryMessage({ content: summary });
+      await this.sendMessageWithData(tempMessage);
+
+      // Conversation is now committed — safely set the priority.
+      if (this.flowState['priority']) {
+        setPriorityAPI(this.flowState['priority']).catch(() => {});
+      }
 
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'options',
@@ -448,7 +457,7 @@ export default {
           this.askProjectBrief();
         } else if (option.action === 'timeline_selected') {
           this.flowState['timeline'] = option.title;
-          this.setPriorityFromTimeline(option.title);
+          this.flowState['priority'] = this.getPriorityFromTimeline(option.title);
           this.askBudget();
         } else if (option.action === 'budget_selected') {
           this.flowState['budget_range'] = option.title;
