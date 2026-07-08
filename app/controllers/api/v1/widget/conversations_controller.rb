@@ -1,6 +1,6 @@
 class Api::V1::Widget::ConversationsController < Api::V1::Widget::BaseController
   include Events::Types
-  before_action :render_not_found_if_empty, only: [:toggle_typing, :toggle_status, :set_custom_attributes, :destroy_custom_attributes]
+  before_action :render_not_found_if_empty, only: [:toggle_typing, :toggle_status, :set_custom_attributes, :destroy_custom_attributes, :set_priority]
 
   def index
     @conversation = conversation
@@ -74,6 +74,15 @@ class Api::V1::Widget::ConversationsController < Api::V1::Widget::BaseController
     render json: conversation
   end
 
+  def set_priority
+    allowed_priorities = %w[urgent high medium low]
+    priority = params[:priority].to_s.downcase
+    return head :unprocessable_entity unless allowed_priorities.include?(priority)
+
+    conversation.update!(priority: priority)
+    head :ok
+  end
+
   private
 
   def send_transcript_email
@@ -95,7 +104,7 @@ class Api::V1::Widget::ConversationsController < Api::V1::Widget::BaseController
   end
 
   def permitted_params
-    params.permit(:id, :typing_status, :website_token, :email, contact: [:name, :email, :phone_number],
+    params.permit(:id, :typing_status, :website_token, :email, :priority, contact: [:name, :email, :phone_number],
                                                                message: [:content, :referer_url, :timestamp, :echo_id],
                                                                custom_attributes: {})
   end

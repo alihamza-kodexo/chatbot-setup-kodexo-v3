@@ -67,6 +67,13 @@ const deleteCustomAttribute = async customAttribute => {
   );
 };
 
+const setPriorityAPI = async priority => {
+  return API.post(
+    `/api/v1/widget/conversations/set_priority${window.location.search}`,
+    { priority }
+  );
+};
+
 export {
   createConversationAPI,
   sendMessageAPI,
@@ -79,4 +86,5 @@ export {
   toggleStatus,
   setCustomAttributes,
   deleteCustomAttribute,
+  setPriorityAPI,
 };

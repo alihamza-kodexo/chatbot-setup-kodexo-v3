@@ -8,6 +8,7 @@ import { MESSAGE_TYPE } from 'shared/constants/messages';
 import { mapActions, mapGetters } from 'vuex';
 import { BUS_EVENTS } from 'shared/constants/busEvents';
 import { emitter } from 'shared/helpers/mitt';
+import { setPriorityAPI } from 'widget/api/conversation';
 
 export default {
   name: 'ConversationWrap',
@@ -181,6 +182,18 @@ export default {
     },
     
     // --- HELPER METHODS FOR FLOW STEPS --- //
+    setPriorityFromTimeline(timelineTitle) {
+      const map = {
+        'ASAP - We need this urgent': 'urgent',
+        '1-3 months': 'high',
+        '3-6 months': 'medium',
+        '6+ months': 'low',
+        'Flexible / Not sure yet': 'low',
+        'Any of the above': 'medium',
+      };
+      const priority = map[timelineTitle] || 'medium';
+      setPriorityAPI(priority).catch(() => {});
+    },
     showStartOverButton() {
       window.isCustomBotFlowActive = false;
       this.flowMessages = [{
@@ -435,6 +448,7 @@ export default {
           this.askProjectBrief();
         } else if (option.action === 'timeline_selected') {
           this.flowState['timeline'] = option.title;
+          this.setPriorityFromTimeline(option.title);
           this.askBudget();
         } else if (option.action === 'budget_selected') {
           this.flowState['budget_range'] = option.title;
