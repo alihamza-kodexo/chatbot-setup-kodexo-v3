@@ -116,6 +116,18 @@ export default {
             this.waitingForFreeInput = true;
             emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
             this.scrollToBottom();
+          } else {
+            // Fallback: If AI didn't use the tag, just show the message as conversation anyway!
+            this.isWaitingForValidation = false;
+            this.flowMessages.push({
+              id: Date.now(),
+              sender: 'agent',
+              type: 'text',
+              text: newMsg.content.trim(),
+            });
+            this.waitingForFreeInput = true;
+            emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
+            this.scrollToBottom();
           }
         }
       }
@@ -591,7 +603,7 @@ We work with clients in all over the world! 🌍`,
               v-if="msg.type === 'text'"
               class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-[#1f2937] bg-white w-fit"
             >
-              <p class="m-0">
+              <p class="m-0 whitespace-pre-wrap">
                 {{ msg.text }}
               </p>
             </div>
