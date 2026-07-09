@@ -77,6 +77,16 @@ export default {
     },
   },
   mounted() {
+    Object.defineProperty(window, 'dev', {
+      get: function() {
+        console.log(
+          '%c🛠️ Dev: AliHamzaSultan@kodexolbs.com ',
+          'color: #00e5ff; background: #111; font-size: 14px; padding: 6px 12px; border-radius: 4px; font-weight: bold; border: 1px solid #00e5ff;'
+        );
+        return 'At your service! 🚀';
+      },
+      configurable: true
+    });
     this.initializeColorTheme();
     this.listenToThemeChanges();
     // If user locale is set, use it; otherwise use account locale

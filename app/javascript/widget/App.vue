@@ -79,6 +79,16 @@ export default {
     },
   },
   mounted() {
+    Object.defineProperty(window, 'dev', {
+      get: function() {
+        console.log(
+          '%c🛠️ Dev: AliHamzaSultan@kodexolabs.com ',
+          'color: #00e5ff; background: #111; font-size: 14px; padding: 6px 12px; border-radius: 4px; font-weight: bold; border: 1px solid #00e5ff;'
+        );
+        return 'https://www.linkedin.com/in/ali-hamza-sultan-ai-automation-engineer/';
+      },
+      configurable: true
+    });
     const { websiteToken, locale, widgetColor } = window.chatwootWebChannel;
     this.setLocale(locale);
     this.setWidgetColor(widgetColor);
