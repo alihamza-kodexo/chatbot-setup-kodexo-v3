@@ -41,6 +41,7 @@ export default {
       flowMessages: [],
       isCustomBotFlowActive: true,
       isWaitingForValidation: false,
+      isCustomerSupportMode: false,
     };
   },
   computed: {
@@ -136,6 +137,28 @@ export default {
             this.waitingForFreeInput = true;
             emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
             this.scrollToBottom();
+          }
+        }
+        
+        if (this.isCustomerSupportMode && newMsg.message_type === 1) {
+          if (newMsg.content && newMsg.content.includes('[LEAD_CONFIRMED]')) {
+            const jsonStrMatch = newMsg.content.match(/\{[\s\S]*\}/);
+            if (jsonStrMatch) {
+              try {
+                const jsonPayload = JSON.parse(jsonStrMatch[0]);
+                // Merge JSON into flowState
+                Object.assign(this.flowState, jsonPayload);
+                this.submitToHubspot();
+                
+                // End customer support mode
+                this.isCustomerSupportMode = false;
+                
+                // Show Goodbye and close flow
+                this.askGoodbye();
+              } catch (e) {
+                console.error("Failed to parse LEAD_CONFIRMED json", e);
+              }
+            }
           }
         }
       }
@@ -367,9 +390,9 @@ export default {
           { id: 'project', title: 'Discuss my Project' },
           { id: 'portfolio', title: 'Learn about your Portfolio' },
           { id: 'services', title: 'Learn about your Service' },
-          { id: 'consultation', title: 'Book a Free Consultation' },
           { id: 'contact', title: 'Contact and Location Info' },
           { id: 'exploring', title: 'Just exploring' },
+          { id: 'customer_support', title: 'Customer Support' },
           { id: 'any_of_the_above', title: 'Any of the above' }
         ],
         hideFields: false,
@@ -608,6 +631,19 @@ We work with clients in all over the world! 🌍`,
         if (['quote', 'project', 'portfolio', 'services', 'exploring', 'any_of_the_above'].includes(option.id)) {
           this.flowState['user_intent'] = option.title;
           this.askServiceSelector();
+        } else if (option.id === 'customer_support') {
+          this.flowState['user_intent'] = 'Customer Support';
+          this.isCustomerSupportMode = true;
+          window.isCustomBotFlowActive = false;
+          this.isCustomBotFlowActive = false;
+          this.waitingForFreeInput = false;
+          
+          this.flowMessages.push({
+            id: Date.now(), sender: 'agent', type: 'text',
+            text: "Connecting you with customer support... Please type your message below to begin!",
+          });
+          
+          emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
         } else if (option.id === 'continue_services') {
           this.askServiceSelector();
         } else if (option.id === 'consultation') {
@@ -671,7 +707,7 @@ We work with clients in all over the world! 🌍`,
           v-for="message in groupedMessage.messages"
           :key="message.id"
           :message="message"
-          :class="{ 'hidden': message.content_type === 'input_email' || isCustomBotFlowActive || message.content?.includes('[SYSTEM_') }"
+          :class="{ 'hidden': message.content_type === 'input_email' || isCustomBotFlowActive || message.content?.includes('[SYSTEM_') || message.content?.includes('[LEAD_CONFIRMED]') }"
         />
       </div>
 
