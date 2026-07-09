@@ -703,12 +703,13 @@ We work with clients in all over the world! 🌍`,
         class="messages-wrap"
       >
         <DateSeparator :date="groupedMessage.date" />
-        <ChatMessage
+        <div
           v-for="message in groupedMessage.messages"
           :key="message.id"
-          :message="message"
           :class="{ 'hidden': message.content_type === 'input_email' || isCustomBotFlowActive || message.content?.includes('[SYSTEM_') || message.content?.includes('[LEAD_CONFIRMED]') }"
-        />
+        >
+          <ChatMessage :message="message" />
+        </div>
       </div>
 
       <!-- Test Flow Messages -->
