@@ -148,34 +148,14 @@ export default {
         
         if (this.isCustomerSupportMode && newMsg.message_type === 1) {
           this.isBotTyping = false;
-          if (newMsg.content && newMsg.content.includes('[LEAD_CONFIRMED]')) {
-            const jsonStrMatch = newMsg.content.match(/\{[\s\S]*\}/);
-            if (jsonStrMatch) {
-              try {
-                const jsonPayload = JSON.parse(jsonStrMatch[0]);
-                // Merge JSON into flowState
-                Object.assign(this.flowState, jsonPayload);
-                this.submitToHubspot();
-                
-                // End customer support mode
-                this.isCustomerSupportMode = false;
-                
-                // Show Goodbye and close flow
-                this.askGoodbye();
-              } catch (e) {
-                console.error("Failed to parse LEAD_CONFIRMED json", e);
-              }
-            }
-          } else {
-            // Push agent's message into flowMessages!
-            this.flowMessages.push({
-               id: Date.now(),
-               sender: 'agent',
-               type: 'text',
-               text: newMsg.content.trim()
-            });
-            this.scrollToBottom();
-          }
+          // Display agent's/webhook's message in the custom flow
+          this.flowMessages.push({
+             id: Date.now(),
+             sender: 'agent',
+             type: 'text',
+             text: newMsg.content.trim()
+          });
+          this.scrollToBottom();
         }
       }
     }
@@ -646,6 +626,10 @@ We work with clients in all over the world! 🌍`,
         type: 'text',
         text: option.title,
       });
+
+      // Instantly send the selection to Chatwoot backend so partial leads aren't lost
+      const tempMessage = createTemporaryMessage({ content: `[User selected] ${option.title}` });
+      this.sendMessageWithData(tempMessage).catch(() => {});
 
       this.isBotTyping = true;
       this.scrollToBottom();
