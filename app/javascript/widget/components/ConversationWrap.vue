@@ -141,6 +141,7 @@ export default {
         }
         
         if (this.isCustomerSupportMode && newMsg.message_type === 1) {
+          this.isBotTyping = false;
           if (newMsg.content && newMsg.content.includes('[LEAD_CONFIRMED]')) {
             const jsonStrMatch = newMsg.content.match(/\{[\s\S]*\}/);
             if (jsonStrMatch) {
@@ -159,6 +160,15 @@ export default {
                 console.error("Failed to parse LEAD_CONFIRMED json", e);
               }
             }
+          } else {
+            // Push agent's message into flowMessages!
+            this.flowMessages.push({
+               id: Date.now(),
+               sender: 'agent',
+               type: 'text',
+               text: newMsg.content.trim()
+            });
+            this.scrollToBottom();
           }
         }
       }
@@ -266,11 +276,13 @@ export default {
         this.previousScrollHeight = this.$el.scrollHeight;
       }
     },
-    // Called when user types freely
     async onFreeInputReceived({ content }) {
       if (!this.waitingForFreeInput) return;
-      this.waitingForFreeInput = false;
-      emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
+      
+      if (!this.isCustomerSupportMode) {
+        this.waitingForFreeInput = false;
+        emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
+      }
       
       this.flowState[this.currentInputStep] = content;
 
@@ -323,15 +335,22 @@ export default {
           // Only wait for n8n AI validation on complex free-text fields
           this.isWaitingForValidation = true;
           await this.sendMessageWithData(tempMessage);
+        } else if (this.isCustomerSupportMode) {
+          // Just send the message and don't proceed to any next step
+          this.sendMessageWithData(tempMessage).catch(() => {});
         } else {
           // Instantly proceed for fields validated client-side (email/phone)
           this.sendMessageWithData(tempMessage).catch(() => {});
           this.proceedToNextStep();
         }
       } catch (e) {
-        // Fallback if API fails
-        this.isWaitingForValidation = false;
-        this.proceedToNextStep();
+        if (this.isCustomerSupportMode) {
+           this.isBotTyping = false;
+        } else {
+           // Fallback if API fails
+           this.isWaitingForValidation = false;
+           this.proceedToNextStep();
+        }
       }
     },
     
@@ -634,9 +653,10 @@ We work with clients in all over the world! 🌍`,
         } else if (option.id === 'customer_support') {
           this.flowState['user_intent'] = 'Customer Support';
           this.isCustomerSupportMode = true;
-          window.isCustomBotFlowActive = false;
-          this.isCustomBotFlowActive = false;
-          this.waitingForFreeInput = false;
+          window.isCustomBotFlowActive = true;
+          this.isCustomBotFlowActive = true;
+          this.waitingForFreeInput = true;
+          this.currentInputStep = 'customer_support';
           
           this.flowMessages.push({
             id: Date.now(), sender: 'agent', type: 'text',
