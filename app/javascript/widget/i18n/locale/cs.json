@@ -57,7 +57,7 @@
   "BUBBLE": {
     "LABEL": "Napiště nám"
   },
-  "POWERED_BY": "Powered by The-Agentive.ai",
+  "POWERED_BY": "Powered by kodexolabs.com",
   "EMAIL_PLACEHOLDER": "Prosím, zadejte svůj e-mail",
   "CHAT_PLACEHOLDER": "Zde začněte psát",
   "TODAY": "Dnes",
@@ -151,3 +151,4 @@
     "REPLY_TO": "Odpověď na:"
   }
 }
+

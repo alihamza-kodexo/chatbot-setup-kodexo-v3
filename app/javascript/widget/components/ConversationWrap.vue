@@ -111,6 +111,7 @@ export default {
             this.proceedToNextStep();
           } else if (newMsg.content && newMsg.content.includes('[SYSTEM_INVALID]')) {
             this.isWaitingForValidation = false;
+            this.isBotTyping = false;
             const errorMsg = newMsg.content.replace('[SYSTEM_INVALID]', '').trim();
             this.flowMessages.push({
               id: Date.now(),
@@ -125,6 +126,7 @@ export default {
           } else {
             // Fallback: If AI didn't use the tag, just show the message as conversation anyway!
             this.isWaitingForValidation = false;
+            this.isBotTyping = false;
             this.flowMessages.push({
               id: Date.now(),
               sender: 'agent',
