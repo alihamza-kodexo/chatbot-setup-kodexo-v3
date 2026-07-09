@@ -42,6 +42,7 @@ export default {
       isCustomBotFlowActive: true,
       isWaitingForValidation: false,
       isCustomerSupportMode: false,
+      lastProcessedMessageId: null,
     };
   },
   computed: {
@@ -105,6 +106,11 @@ export default {
       handler(newMsg) {
         if (!newMsg) return;
         
+        
+        // Prevent processing the same message twice due to deep watcher updates
+        if (this.lastProcessedMessageId === newMsg.id) return;
+        this.lastProcessedMessageId = newMsg.id;
+
         // 1 = incoming from agent/bot
         if (this.isWaitingForValidation && newMsg.message_type === 1) {
           if (newMsg.content && newMsg.content.includes('[SYSTEM_VALID]')) {
