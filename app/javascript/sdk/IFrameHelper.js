@@ -328,7 +328,19 @@ export const IFrameHelper = {
     const logoImg = document.createElement('img');
     logoImg.src = `${window.$chatwoot.baseUrl}/brand-assets/widget_logo.png`;
     logoImg.alt = 'Chat';
-    logoImg.style.cssText = 'width:44px;height:44px;object-fit:contain;display:block;';
+    logoImg.style.cssText = 'width:44px;height:44px;object-fit:contain;display:none;';
+    
+    const spinnerHtml = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4V2M12 22v-2M4 12H2m22 0h-2m-2.05-6.95l1.41-1.41M4.64 19.36l1.41-1.41M19.36 19.36l-1.41-1.41M4.64 4.64l1.41 1.41" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>`;
+    const spinnerWrapper = document.createElement('div');
+    spinnerWrapper.innerHTML = spinnerHtml;
+    spinnerWrapper.style.cssText = 'display:flex;align-items:center;justify-content:center;width:44px;height:44px;';
+    
+    logoImg.onload = () => {
+      spinnerWrapper.style.display = 'none';
+      logoImg.style.display = 'block';
+    };
+
+    chatIcon.appendChild(spinnerWrapper);
     chatIcon.appendChild(logoImg);
 
     addClasses(closeBubble, closeBtnClassName);

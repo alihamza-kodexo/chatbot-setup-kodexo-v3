@@ -72,8 +72,13 @@ export default {
     isFetchingList(fetching) {
       if (!fetching && !this.hasHandledInitialLoad) {
         this.hasHandledInitialLoad = true;
+        const isFlowCompleted = localStorage.getItem('kodexo_flow_completed') === 'true';
+
         if (this.conversationSize === 0) {
+          localStorage.removeItem('kodexo_flow_progress');
           this.askInitialIntent();
+        } else if (!isFlowCompleted) {
+          if (!this.restoreFlowProgress()) this.askInitialIntent();
         } else {
           this.showStartOverButton();
         }
@@ -87,6 +92,7 @@ export default {
       deep: true,
       handler() {
         this.$nextTick(() => {
+          this.saveFlowProgress();
           setTimeout(() => {
             this.scrollToBottom();
           }, 150);
@@ -143,18 +149,27 @@ export default {
     
     if (!this.isFetchingList) {
       this.hasHandledInitialLoad = true;
+      const isFlowCompleted = localStorage.getItem('kodexo_flow_completed') === 'true';
+
       if (this.conversationSize === 0) {
+        localStorage.removeItem('kodexo_flow_progress');
         // Send a hidden trigger message to create the conversation in the backend immediately
         const initMessage = createTemporaryMessage({ content: '[SYSTEM_INIT] User started flow' });
         this.sendMessageWithData(initMessage).catch(() => {});
         this.askInitialIntent();
+      } else if (!isFlowCompleted) {
+        if (!this.restoreFlowProgress()) this.askInitialIntent();
       } else {
         this.showStartOverButton();
       }
     }
     
     this.scrollToBottom();
-    emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
+    setTimeout(() => {
+      if (!this.waitingForFreeInput) {
+        emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
+      }
+    }, 50);
     emitter.on(BUS_EVENTS.MESSAGE_SENT, this.onFreeInputReceived);
   },
   updated() {
@@ -171,6 +186,42 @@ export default {
   },
   methods: {
     ...mapActions('conversation', ['fetchOldConversations', 'sendMessage', 'sendMessageWithData']),
+    saveFlowProgress() {
+      localStorage.setItem('kodexo_flow_progress', JSON.stringify({
+        flowState: this.flowState,
+        flowMessages: this.flowMessages,
+        currentInputStep: this.currentInputStep,
+        waitingForFreeInput: this.waitingForFreeInput,
+        isWaitingForValidation: this.isWaitingForValidation,
+      }));
+    },
+    restoreFlowProgress() {
+      const saved = localStorage.getItem('kodexo_flow_progress');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data && data.flowMessages && data.flowMessages.length > 0) {
+            this.flowState = data.flowState || {};
+            this.flowMessages = data.flowMessages || [];
+            this.currentInputStep = data.currentInputStep || null;
+            this.waitingForFreeInput = data.waitingForFreeInput || false;
+            this.isWaitingForValidation = data.isWaitingForValidation || false;
+            
+            setTimeout(() => {
+              if (this.waitingForFreeInput) {
+                emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
+              } else {
+                emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
+              }
+            }, 50);
+            return true;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+      return false;
+    },
     scrollToBottom() {
       const container = this.$el;
       container.scrollTop = container.scrollHeight - this.previousScrollHeight;
@@ -501,6 +552,7 @@ We work with clients in all over the world! 🌍`,
       }
     },
     async askGoodbye() {
+      localStorage.setItem('kodexo_flow_completed', 'true');
       const summary = `Lead Collected:
 - Intent: ${this.flowState['user_intent'] || 'N/A'}
 - Service: ${this.flowState['project_type'] || 'N/A'}
@@ -585,8 +637,11 @@ We work with clients in all over the world! 🌍`,
           this.submitToHubspot();
           this.askGoodbye();
         } else if (option.action === 'start_over') {
+          localStorage.removeItem('kodexo_flow_completed');
+          localStorage.removeItem('kodexo_flow_progress');
           this.flowState = {};
           window.isCustomBotFlowActive = true;
+          this.isCustomBotFlowActive = true;
           this.askInitialIntent();
         }
         

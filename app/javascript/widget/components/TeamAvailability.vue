@@ -1,8 +1,10 @@
 <script setup>
+import { ref } from 'vue';
 import { IFrameHelper } from 'widget/helpers/utils';
 import { CHATWOOT_ON_START_CONVERSATION } from '../constants/sdkEvents';
 import AvailabilityContainer from 'widget/components/Availability/AvailabilityContainer.vue';
 import { useMapGetter } from 'dashboard/composables/store.js';
+import Spinner from 'shared/components/Spinner.vue';
 
 const props = defineProps({
   availableAgents: { type: Array, default: () => [] },
@@ -12,8 +14,11 @@ const props = defineProps({
 const emit = defineEmits(['startConversation']);
 
 const widgetColor = useMapGetter('appConfig/getWidgetColor');
+const isLoading = ref(false);
 
 const startConversation = () => {
+  if (isLoading.value) return;
+  isLoading.value = true;
   emit('startConversation');
   if (!props.hasConversation) {
     IFrameHelper.sendMessage({
@@ -33,7 +38,8 @@ const startConversation = () => {
 
     <button
       class="inline-flex items-center gap-1 font-medium text-n-slate-12"
-      :style="{ color: widgetColor }"
+      :style="{ color: widgetColor, opacity: isLoading ? 0.7 : 1 }"
+      :disabled="isLoading"
       @click="startConversation"
     >
       <span>
@@ -43,7 +49,8 @@ const startConversation = () => {
             : $t('START_CONVERSATION')
         }}
       </span>
-      <i class="i-lucide-chevron-right size-5 mt-px" />
+      <Spinner v-if="isLoading" size="small" />
+      <i v-else class="i-lucide-chevron-right size-5 mt-px" />
     </button>
   </div>
 </template>
