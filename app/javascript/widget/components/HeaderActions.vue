@@ -39,16 +39,8 @@ export default {
     isRNWebView() {
       return RNHelper.isRNWebView();
     },
-    isCustomFlowActive() {
-      return window.isCustomBotFlowActive;
-    },
     showHeaderActions() {
-      return (
-        this.isIframe ||
-        this.isRNWebView ||
-        this.hasWidgetOptions ||
-        this.isCustomFlowActive
-      );
+      return true;
     },
     conversationStatus() {
       return this.conversationAttributes.status;
@@ -107,7 +99,6 @@ export default {
     </button>
     
     <button
-      v-if="isCustomFlowActive"
       class="button transparent compact"
       title="Start Over"
       @click="triggerStartOver"
