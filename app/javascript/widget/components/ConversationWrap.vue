@@ -134,11 +134,14 @@ export default {
             // Fallback: If AI didn't use the tag, just show the message as conversation anyway!
             this.isWaitingForValidation = false;
             this.isBotTyping = false;
+            const processed = this.processWebhookMessage(newMsg.content);
             this.flowMessages.push({
               id: Date.now(),
               sender: 'agent',
               type: 'text',
-              text: newMsg.content.trim(),
+              text: processed.text,
+              actionLink: processed.actionLink,
+              actionText: processed.actionText,
             });
             this.waitingForFreeInput = true;
             emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
@@ -149,11 +152,14 @@ export default {
         if (this.isCustomerSupportMode && newMsg.message_type === 1) {
           this.isBotTyping = false;
           // Display agent's/webhook's message in the custom flow
+          const processed = this.processWebhookMessage(newMsg.content);
           this.flowMessages.push({
              id: Date.now(),
              sender: 'agent',
              type: 'text',
-             text: newMsg.content.trim()
+             text: processed.text,
+             actionLink: processed.actionLink,
+             actionText: processed.actionText,
           });
           this.scrollToBottom();
         }
@@ -359,6 +365,22 @@ export default {
     },
     
     // --- HELPER METHODS FOR FLOW STEPS --- //
+    processWebhookMessage(content) {
+      if (!content) return { text: '', actionLink: null, actionText: null };
+      let text = content.trim();
+      let actionLink = null;
+      let actionText = null;
+      
+      const meetingUrlMatch = text.match(/https?:\/\/(?:www\.)?kodexolabs\.com\/book-a-meeting\/?/i);
+      
+      if (meetingUrlMatch) {
+        text = text.replace(meetingUrlMatch[0], '').trim();
+        actionLink = meetingUrlMatch[0];
+        actionText = '🗓️ Book a Meeting';
+      }
+      
+      return { text, actionLink, actionText };
+    },
     getPriorityFromTimeline(timelineTitle) {
       const map = {
         'ASAP - We need this urgent': 'urgent',
@@ -747,6 +769,13 @@ We work with clients in all over the world! 🌍`,
               <p class="m-0 whitespace-pre-wrap">
                 {{ msg.text }}
               </p>
+              
+              <!-- Optional Action Button -->
+              <div v-if="msg.actionLink" class="mt-3">
+                <a :href="msg.actionLink" target="_blank" rel="noopener noreferrer" class="inline-block px-5 py-2.5 bg-[#F54545] text-white text-sm font-medium rounded-full no-underline hover:bg-[#d63d3d] transition-colors shadow-sm">
+                  {{ msg.actionText }}
+                </a>
+              </div>
             </div>
 
             <!-- Options Bubble -->
