@@ -59,13 +59,16 @@ export default {
       return `${this.darkMode === 'dark' ? 'dark-scheme' : 'light-scheme'}`;
     },
     showStatusIndicator() {
+      if (this.isCustomBotFlowActive) {
+        return this.isBotTyping || this.isWaitingForValidation;
+      }
+      
       const { status } = this.conversationAttributes;
       const isConversationInPendingStatus = status === 'pending';
       const isLastMessageIncoming =
         this.lastMessage && this.lastMessage.message_type === MESSAGE_TYPE.INCOMING;
       return (
         this.isAgentTyping ||
-        this.isBotTyping ||
         (isConversationInPendingStatus && isLastMessageIncoming)
       );
     },
@@ -198,6 +201,7 @@ export default {
       }
     }, 50);
     emitter.on(BUS_EVENTS.MESSAGE_SENT, this.onFreeInputReceived);
+    emitter.on('START_OVER_FLOW', this.onStartOverRequested);
   },
   updated() {
     if (this.previousConversationSize !== this.conversationSize) {
@@ -209,9 +213,27 @@ export default {
     window.isCustomBotFlowActive = false;
     this.$el.removeEventListener('scroll', this.handleScroll);
     emitter.off(BUS_EVENTS.MESSAGE_SENT, this.onFreeInputReceived);
+    emitter.off('START_OVER_FLOW', this.onStartOverRequested);
     emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
   },
   methods: {
+    onStartOverRequested() {
+      localStorage.removeItem('kodexo_flow_completed');
+      localStorage.removeItem('kodexo_flow_progress');
+      this.flowState = {};
+      this.flowMessages = [];
+      this.currentInputStep = null;
+      this.waitingForFreeInput = false;
+      this.isWaitingForValidation = false;
+      this.isCustomerSupportMode = false;
+      window.isCustomBotFlowActive = true;
+      this.isCustomBotFlowActive = true;
+      this.askInitialIntent();
+      
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+    },
     ...mapActions('conversation', ['fetchOldConversations', 'sendMessage', 'sendMessageWithData']),
     saveFlowProgress() {
       localStorage.setItem('kodexo_flow_progress', JSON.stringify({
@@ -707,12 +729,7 @@ We work with clients in all over the world! 🌍`,
           this.submitToHubspot();
           this.askGoodbye();
         } else if (option.action === 'start_over') {
-          localStorage.removeItem('kodexo_flow_completed');
-          localStorage.removeItem('kodexo_flow_progress');
-          this.flowState = {};
-          window.isCustomBotFlowActive = true;
-          this.isCustomBotFlowActive = true;
-          this.askInitialIntent();
+          this.onStartOverRequested();
         }
         
         this.scrollToBottom();

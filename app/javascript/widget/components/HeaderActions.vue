@@ -5,6 +5,7 @@ import { popoutChatWindow } from '../helpers/popoutHelper';
 import FluentIcon from 'shared/components/FluentIcon/Index.vue';
 import configMixin from 'widget/mixins/configMixin';
 import { CONVERSATION_STATUS } from 'shared/constants/messages';
+import { emitter } from 'shared/helpers/mitt';
 
 export default {
   name: 'HeaderActions',
@@ -38,8 +39,16 @@ export default {
     isRNWebView() {
       return RNHelper.isRNWebView();
     },
+    isCustomFlowActive() {
+      return window.isCustomBotFlowActive;
+    },
     showHeaderActions() {
-      return this.isIframe || this.isRNWebView || this.hasWidgetOptions;
+      return (
+        this.isIframe ||
+        this.isRNWebView ||
+        this.hasWidgetOptions ||
+        this.isCustomFlowActive
+      );
     },
     conversationStatus() {
       return this.conversationAttributes.status;
@@ -73,6 +82,9 @@ export default {
     resolveConversation() {
       this.$store.dispatch('conversation/resolveConversation');
     },
+    triggerStartOver() {
+      emitter.emit('START_OVER_FLOW');
+    },
   },
 };
 </script>
@@ -93,6 +105,16 @@ export default {
     >
       <FluentIcon icon="sign-out" size="22" class="text-n-slate-12" />
     </button>
+    
+    <button
+      v-if="isCustomFlowActive"
+      class="button transparent compact"
+      title="Start Over"
+      @click="triggerStartOver"
+    >
+      <FluentIcon icon="arrow-clockwise" size="22" class="text-n-slate-12" />
+    </button>
+    
     <button
       v-if="showPopoutButton"
       class="button transparent compact new-window--button"
