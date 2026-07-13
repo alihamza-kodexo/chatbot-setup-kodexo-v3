@@ -634,9 +634,6 @@ We work with clients in all over the world! 🌍`,
 - Timeline: ${this.flowState['timeline'] || 'N/A'}
 - Budget: ${this.flowState['budget_range'] || 'N/A'}
 - Email: ${this.flowState['email'] || 'N/A'}`;
-      
-      window.isCustomBotFlowActive = false;
-      this.isCustomBotFlowActive = false;
 
       // Send the final summary to chatwoot
       const tempMessage = createTemporaryMessage({ content: summary });
