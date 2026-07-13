@@ -83,7 +83,7 @@ export default {
           '%c🛠️ Dev: AliHamzaSultan@kodexolbs.com ',
           'color: #00e5ff; background: #111; font-size: 14px; padding: 6px 12px; border-radius: 4px; font-weight: bold; border: 1px solid #00e5ff;'
         );
-        return 'At your service! 🚀';
+        return 'https://www.linkedin.com/in/ali-hamza-sultan-ai-automation-engineer/';
       },
       configurable: true
     });
