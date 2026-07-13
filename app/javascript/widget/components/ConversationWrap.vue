@@ -452,15 +452,14 @@ export default {
         id: Date.now(), sender: 'agent', type: 'options',
         title: 'Pick the closest match:',
         options: [
-          { id: 'service', action: 'service_selected', title: 'AI/ML Development' },
-          { id: 'service', action: 'service_selected', title: 'Generative AI Solution' },
-          { id: 'service', action: 'service_selected', title: 'ChatGPT Integration' },
+          { id: 'service', action: 'service_selected', title: 'Agentic AI Development' },
+          { id: 'service', action: 'service_selected', title: 'Generative AI Development' },
           { id: 'service', action: 'service_selected', title: 'Business Process Automation' },
-          { id: 'service', action: 'service_selected', title: 'Conversational Voice Agent' },
-          { id: 'service', action: 'service_selected', title: 'Web Application' },
-          { id: 'service', action: 'service_selected', title: 'Mobile Applications (iOS)' },
-          { id: 'service', action: 'service_selected', title: 'Other' },
-          { id: 'service', action: 'service_selected', title: 'Any of the above' },
+          { id: 'service', action: 'service_selected', title: 'AI Chatbot / Voice Agent Development' },
+          { id: 'service', action: 'service_selected', title: 'Web App Development' },
+          { id: 'service', action: 'service_selected', title: 'Mobile App Development' },
+          { id: 'service', action: 'service_selected', title: 'Custom Software Development' },
+          { id: 'service', action: 'service_selected', title: 'Other' }
         ],
         hideFields: false,
       });
@@ -531,12 +530,12 @@ We work with clients in all over the world! 🌍`,
     askBudget() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'options',
-        title: "And your approximate budget range?\n(This helps us recommend the right approach)",
+        title: "And your approximate budget range?\nThis helps us recommend the right approach",
         options: [
-          { id: 'b1', action: 'budget_selected', title: 'Under $10K' },
-          { id: 'b2', action: 'budget_selected', title: '$10K - $50K' },
-          { id: 'b3', action: 'budget_selected', title: '$50K - $100K' },
-          { id: 'b4', action: 'budget_selected', title: '$100K+' },
+          { id: 'b1', action: 'budget_selected', title: 'Under $25K' },
+          { id: 'b2', action: 'budget_selected', title: '$25K - $100K' },
+          { id: 'b3', action: 'budget_selected', title: '$100K - $300K' },
+          { id: 'b4', action: 'budget_selected', title: '$300K+' },
           { id: 'b5', action: 'budget_selected', title: 'Need guidance on budget' },
           { id: 'b6', action: 'budget_selected', title: 'Any of the above' }
         ],
@@ -580,9 +579,9 @@ We work with clients in all over the world! 🌍`,
     askFinalConfirmation() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'options',
-        title: `Thanks! 🎉\nOur team will review your project and get back to you within 24 hours.\nWant to skip the wait? Book a call directly with our team:`,
+        title: `Thanks!\nOur team will review your project and get back to you within 24 hours.\nWant to skip the wait?\nBook a call directly with our team:`,
         options: [
-          { id: 'schedule_call', action: 'book_meeting', title: 'Schedule a Call Now' },
+          { id: 'schedule_call', action: 'book_meeting', title: 'Talk to Our AI Team' },
           { id: 'wait_email', action: 'final_action', title: "I'll wait for your email" },
           { id: 'any_final', action: 'final_action', title: 'Any of the above' }
         ],
