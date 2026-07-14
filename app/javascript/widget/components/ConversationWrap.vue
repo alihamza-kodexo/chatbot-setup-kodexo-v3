@@ -4,13 +4,13 @@ import AgentTypingBubble from 'widget/components/AgentTypingBubble.vue';
 import DateSeparator from 'shared/components/DateSeparator.vue';
 import Spinner from 'shared/components/Spinner.vue';
 import { useDarkMode } from 'widget/composables/useDarkMode';
-import { useMessageFormatter } from 'shared/composables/useMessageFormatter';
 import { MESSAGE_TYPE } from 'shared/constants/messages';
 import { mapActions, mapGetters } from 'vuex';
 import { BUS_EVENTS } from 'shared/constants/busEvents';
 import { emitter } from 'shared/helpers/mitt';
 import { setPriorityAPI } from 'widget/api/conversation';
 import { createTemporaryMessage } from 'widget/store/modules/conversation/helpers';
+import MessageFormatter from 'shared/helpers/MessageFormatter';
 
 export default {
   name: 'ConversationWrap',
@@ -28,8 +28,7 @@ export default {
   },
   setup() {
     const { darkMode } = useDarkMode();
-    const { formatMessage } = useMessageFormatter();
-    return { darkMode, formatMessage };
+    return { darkMode };
   },
   data() {
     return {
@@ -219,6 +218,18 @@ export default {
     emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
   },
   methods: {
+    formatMessage(text) {
+      if (!text) return '';
+      
+      // Pre-process LLM text to ensure inline lists have line breaks
+      // Replaces " - " with "\n- " and " 1. " with "\n1. " if they aren't already on a new line
+      let processedText = text
+        .replace(/([^\n])\s+-\s/g, '$1\n- ')
+        .replace(/([^\n])\s+(\d+\.)\s/g, '$1\n$2 ');
+        
+      const formatter = new MessageFormatter(processedText);
+      return formatter.formattedMessage;
+    },
     onStartOverRequested() {
       localStorage.removeItem('kodexo_flow_completed');
       localStorage.removeItem('kodexo_flow_progress');
@@ -402,9 +413,6 @@ export default {
         actionLink = meetingUrlMatch[0];
         actionText = '🗓️ Book a Meeting';
       }
-      
-      // Inject missing newlines for bullet points if the webhook stripped them
-      text = text.replace(/ - /g, '\n- ').replace(/ \* /g, '\n* ');
       
       return { text, actionLink, actionText };
     },
@@ -783,9 +791,9 @@ We work with clients in all over the world! 🌍`,
               class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-[#1f2937] bg-white w-fit"
             >
               <div 
-                v-dompurify-html="formatMessage(msg.text, false)" 
-                class="message-content m-0"
-              />
+                class="m-0 text-sm format-markdown chat-bubble-content" 
+                v-dompurify-html="formatMessage(msg.text)"
+              ></div>
               
               <!-- Optional Action Button -->
               <div v-if="msg.actionLink" class="mt-3">
@@ -862,5 +870,28 @@ We work with clients in all over the world! 🌍`,
 .message-fade-leave-to {
   opacity: 0;
   transform: translateY(15px) scale(0.98);
+}
+
+.format-markdown :deep(p) {
+  margin: 0;
+  margin-bottom: 0.5rem;
+}
+.format-markdown :deep(p:last-child) {
+  margin-bottom: 0;
+}
+.format-markdown :deep(ul) {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.format-markdown :deep(ol) {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.format-markdown :deep(strong), .format-markdown :deep(b) {
+  font-weight: 600;
 }
 </style>
