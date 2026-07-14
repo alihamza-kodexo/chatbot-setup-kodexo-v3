@@ -403,6 +403,9 @@ export default {
         actionText = '🗓️ Book a Meeting';
       }
       
+      // Inject missing newlines for bullet points if the webhook stripped them
+      text = text.replace(/ - /g, '\n- ').replace(/ \* /g, '\n* ');
+      
       return { text, actionLink, actionText };
     },
     getPriorityFromTimeline(timelineTitle) {
