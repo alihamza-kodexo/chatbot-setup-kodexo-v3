@@ -4,6 +4,7 @@ import AgentTypingBubble from 'widget/components/AgentTypingBubble.vue';
 import DateSeparator from 'shared/components/DateSeparator.vue';
 import Spinner from 'shared/components/Spinner.vue';
 import { useDarkMode } from 'widget/composables/useDarkMode';
+import { useMessageFormatter } from 'shared/composables/useMessageFormatter';
 import { MESSAGE_TYPE } from 'shared/constants/messages';
 import { mapActions, mapGetters } from 'vuex';
 import { BUS_EVENTS } from 'shared/constants/busEvents';
@@ -27,7 +28,8 @@ export default {
   },
   setup() {
     const { darkMode } = useDarkMode();
-    return { darkMode };
+    const { formatMessage } = useMessageFormatter();
+    return { darkMode, formatMessage };
   },
   data() {
     return {
@@ -777,9 +779,10 @@ We work with clients in all over the world! 🌍`,
               v-if="msg.type === 'text'"
               class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-[#1f2937] bg-white w-fit"
             >
-              <p class="m-0 whitespace-pre-wrap">
-                {{ msg.text }}
-              </p>
+              <div 
+                v-dompurify-html="formatMessage(msg.text, false)" 
+                class="message-content m-0"
+              />
               
               <!-- Optional Action Button -->
               <div v-if="msg.actionLink" class="mt-3">
