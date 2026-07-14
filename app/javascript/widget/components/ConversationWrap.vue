@@ -415,8 +415,6 @@ export default {
       return map[timelineTitle] || 'medium';
     },
     showStartOverButton() {
-      window.isCustomBotFlowActive = false;
-      this.isCustomBotFlowActive = false;
       this.flowMessages = [{
         id: Date.now(),
         sender: 'agent',
