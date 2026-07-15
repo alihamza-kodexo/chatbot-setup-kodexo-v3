@@ -454,8 +454,8 @@ export default {
         options: [
           { id: 'quote', title: 'I need a quote' },
           { id: 'project', title: 'Discuss my Project' },
-          { id: 'portfolio', title: 'Learn about your Portfolio' },
-          { id: 'services', title: 'Learn about your Service' },
+          { id: 'portfolio', title: 'See our work' },
+          { id: 'services', title: 'Explore our services' },
           { id: 'contact', title: 'Contact and Location Info' },
           { id: 'exploring', title: 'Just exploring' },
           { id: 'customer_support', title: 'Customer Support' }
@@ -662,6 +662,16 @@ We work with clients in all over the world! 🌍`,
     },
 
     async onOptionSelect(option, messageIndex) {
+      // Early exit for external links so the UI doesn't change
+      if (option.id === 'services') {
+        window.open('https://kodexolabs.com/services/', '_blank', 'noopener,noreferrer');
+        return;
+      }
+      if (option.id === 'portfolio') {
+        window.open('https://kodexolabs.com/portfolio/', '_blank', 'noopener,noreferrer');
+        return;
+      }
+
       // Mark current options as selected and hide choices
       this.flowMessages[messageIndex].selected = option.id;
       this.flowMessages[messageIndex].hideFields = true;
@@ -684,7 +694,7 @@ We work with clients in all over the world! 🌍`,
       // Route to next step
       setTimeout(() => {
         this.isBotTyping = false;
-        if (['quote', 'project', 'portfolio', 'services', 'exploring', 'any_of_the_above'].includes(option.id)) {
+        if (['quote', 'project', 'exploring', 'any_of_the_above'].includes(option.id)) {
           this.flowState['user_intent'] = option.title;
           this.askServiceSelector();
         } else if (option.id === 'customer_support') {
