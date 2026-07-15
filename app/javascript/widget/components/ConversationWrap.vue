@@ -385,7 +385,7 @@ export default {
     proceedToNextStep() {
       this.isBotTyping = false;
       if (this.currentInputStep === 'project_brief') {
-        this.askTimeline();
+        this.askEmail();
       } else if (this.currentInputStep === 'email') {
         const content = this.flowState['email'];
         const emailName = content.split('@')[0];
@@ -394,7 +394,7 @@ export default {
       } else if (this.currentInputStep === 'phone') {
         const content = this.flowState['phone'];
         this.$store.dispatch('contacts/update', { user: { phone_number: content } }).catch(() => {});
-        this.askReferralSource();
+        this.askTimeline();
       }
       this.scrollToBottom();
     },
@@ -452,8 +452,7 @@ export default {
           { id: 'services', title: 'Learn about your Service' },
           { id: 'contact', title: 'Contact and Location Info' },
           { id: 'exploring', title: 'Just exploring' },
-          { id: 'customer_support', title: 'Customer Support' },
-          { id: 'any_of_the_above', title: 'Any of the above' }
+          { id: 'customer_support', title: 'Customer Support' }
         ],
         hideFields: false,
       });
@@ -481,8 +480,7 @@ export default {
         title: "Awesome choice! 🗓️\nBook your free 30-minute consultation with our team. We'll discuss your project, answer questions, and see how we can help.",
         options: [
           { id: 'book_call_now', title: 'Book a Call Now' },
-          { id: 'continue_services', title: 'Continue to Select Services' },
-          { id: 'any_of_the_above_consult', action: 'service_selected', title: 'Any of the above' }
+          { id: 'continue_services', title: 'Continue to Select Services' }
         ],
         hideFields: false,
       });
@@ -508,8 +506,7 @@ Karachi: B-145, Block 5 Gulshan-e-Iqbal, Karachi
 
 We work with clients in all over the world! 🌍`,
         options: [
-          { id: 'discuss_project', title: 'Discuss My Project' },
-          { id: 'any_of_the_above_contact', action: 'service_selected', title: 'Any of the above' }
+          { id: 'discuss_project', title: 'Discuss My Project' }
         ],
         hideFields: false,
       });
@@ -532,8 +529,7 @@ We work with clients in all over the world! 🌍`,
           { id: 't2', action: 'timeline_selected', title: '1-3 months' },
           { id: 't3', action: 'timeline_selected', title: '3-6 months' },
           { id: 't4', action: 'timeline_selected', title: '6+ months' },
-          { id: 't5', action: 'timeline_selected', title: 'Flexible / Not sure yet' },
-          { id: 't6', action: 'timeline_selected', title: 'Any of the above' }
+          { id: 't5', action: 'timeline_selected', title: 'Flexible / Not sure yet' }
         ],
         hideFields: false,
       });
@@ -547,8 +543,7 @@ We work with clients in all over the world! 🌍`,
           { id: 'b2', action: 'budget_selected', title: '$25K - $100K' },
           { id: 'b3', action: 'budget_selected', title: '$100K - $300K' },
           { id: 'b4', action: 'budget_selected', title: '$300K+' },
-          { id: 'b5', action: 'budget_selected', title: 'Need guidance on budget' },
-          { id: 'b6', action: 'budget_selected', title: 'Any of the above' }
+          { id: 'b5', action: 'budget_selected', title: 'Need guidance on budget' }
         ],
         hideFields: false,
       });
@@ -581,8 +576,7 @@ We work with clients in all over the world! 🌍`,
           { id: 'r3', action: 'referral_selected', title: 'Referred by Someone' },
           { id: 'r4', action: 'referral_selected', title: 'Social Media' },
           { id: 'r5', action: 'referral_selected', title: 'Clutch' },
-          { id: 'r6', action: 'referral_selected', title: 'Other' },
-          { id: 'r7', action: 'referral_selected', title: 'Any of the above' }
+          { id: 'r6', action: 'referral_selected', title: 'Other' }
         ],
         hideFields: false,
       });
@@ -593,8 +587,7 @@ We work with clients in all over the world! 🌍`,
         title: `Thanks!\nOur team will review your project and get back to you within 24 hours.\nWant to skip the wait?\nBook a call directly with our team:`,
         options: [
           { id: 'schedule_call', action: 'book_meeting', title: 'Talk to Our AI Team' },
-          { id: 'wait_email', action: 'final_action', title: "I'll wait for your email" },
-          { id: 'any_final', action: 'final_action', title: 'Any of the above' }
+          { id: 'wait_email', action: 'final_action', title: "I'll wait for your email" }
         ],
         hideFields: false,
       });
@@ -724,7 +717,7 @@ We work with clients in all over the world! 🌍`,
           this.askBudget();
         } else if (option.action === 'budget_selected') {
           this.flowState['budget_range'] = option.title;
-          this.askEmail();
+          this.askReferralSource();
         } else if (option.action === 'referral_selected') {
           this.flowState['lead_source'] = option.title;
           this.askFinalConfirmation();
