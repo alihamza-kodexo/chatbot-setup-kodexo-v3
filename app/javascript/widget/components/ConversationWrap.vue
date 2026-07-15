@@ -394,6 +394,7 @@ export default {
         const content = this.flowState['email'];
         const emailName = content.split('@')[0];
         this.$store.dispatch('contacts/update', { user: { email: content, name: emailName } }).catch(() => {});
+        this.submitToHubspot('partial');
         this.askPhone();
       } else if (this.currentInputStep === 'phone') {
         const content = this.flowState['phone'];
