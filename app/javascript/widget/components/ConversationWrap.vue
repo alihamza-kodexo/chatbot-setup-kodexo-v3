@@ -331,7 +331,7 @@ export default {
         if (!emailRegex.test(content.trim())) {
           this.flowMessages.push({
             id: Date.now() + 1, sender: 'agent', type: 'text',
-            text: 'Please enter a valid email address.',
+            text: "Hmm, that email doesn't look right. Mind double-checking? (e.g., name@company.com)",
           });
           this.waitingForFreeInput = true;
           emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
@@ -710,7 +710,31 @@ We work with clients in all over the world! 🌍`,
           this.askContactInfo();
         } else if (option.action === 'service_selected') {
           this.flowState['project_type'] = option.title;
-          this.askProjectBrief();
+          
+          const proofLines = {
+            'Agentic AI Development': "Good fit. We built the system that lets Extensiv's ops team query their own data in plain English, 90%+ accuracy across 207 tables.",
+            'Generative AI Development': "We built Teacher AI: 50,000+ users in 30+ countries, $5M+ in revenue.",
+            'AI Chatbot / Voice Agent Development': "We rebuilt the chatbot for North America's largest franchise network. Answer accuracy up 85% across 1,000+ listings.",
+            'Business Process Automation': "We rebuilt Zendrop's launch pipeline: 45% faster to market, 25% more conversions.",
+            'Web App Development': "For an Inc. 5000 fleet company, we built AI search across 160,000 records. Lookups got 85% faster.",
+            'Custom Software Development': "For an Inc. 5000 fleet company, we built AI search across 160,000 records. Lookups got 85% faster.",
+            'Mobile App Development': "51 products shipped across 25+ industries: web, mobile, and AI.",
+            'Other': "51 products across 25+ industries. Odds are we've shipped something close."
+          };
+          
+          if (proofLines[option.title]) {
+            this.flowMessages.push({
+              id: Date.now() + 2, sender: 'agent', type: 'text',
+              text: proofLines[option.title],
+            });
+            // Add a small delay so it feels natural before asking for project brief
+            setTimeout(() => {
+              this.askProjectBrief();
+              this.scrollToBottom();
+            }, 1200);
+          } else {
+            this.askProjectBrief();
+          }
         } else if (option.id === 'discuss_project') {
           this.askProjectBrief();
         } else if (option.action === 'timeline_selected') {
