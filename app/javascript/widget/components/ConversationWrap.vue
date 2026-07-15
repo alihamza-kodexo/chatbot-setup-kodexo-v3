@@ -310,8 +310,12 @@ export default {
         this.waitingForFreeInput = false;
         emitter.emit(BUS_EVENTS.DISABLE_CHAT_INPUT);
       }
-      
-      this.flowState[this.currentInputStep] = content;
+      if (this.currentInputStep === 'project_brief' && this.flowState['project_brief']) {
+        // If the AI asked a follow-up question, append the new answer instead of overwriting the first one!
+        this.flowState['project_brief'] += '\n\n' + content;
+      } else {
+        this.flowState[this.currentInputStep] = content;
+      }
 
       // Add the user's typed message visually to the custom flow
       this.flowMessages.push({
@@ -394,6 +398,7 @@ export default {
       } else if (this.currentInputStep === 'phone') {
         const content = this.flowState['phone'];
         this.$store.dispatch('contacts/update', { user: { phone_number: content } }).catch(() => {});
+        this.submitToHubspot('partial');
         this.askTimeline();
       }
       this.scrollToBottom();
@@ -592,8 +597,9 @@ We work with clients in all over the world! 🌍`,
         hideFields: false,
       });
     },
-    async submitToHubspot() {
+    async submitToHubspot(status = 'completed') {
       const payload = {
+        status: status,
         fields: [
           { name: "fullname", value: this.flowState['name'] || "" },
           { name: "email_address", value: this.flowState['email'] || "" },
@@ -612,11 +618,7 @@ We work with clients in all over the world! 🌍`,
       };
 
       try {
-        const webhookUrl = window.chatwootWebChannel.lead_webhook_url;
-        if (!webhookUrl) {
-          console.warn('No lead_webhook_url configured in Chatwoot settings.');
-          return;
-        }
+        const webhookUrl = 'https://kodexolabs.aaagency.cloud/webhook/leadsaver-husbspot';
         await fetch(webhookUrl, {
           method: 'POST',
           headers: {
