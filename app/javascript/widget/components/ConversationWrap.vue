@@ -11,6 +11,7 @@ import { emitter } from 'shared/helpers/mitt';
 import { setPriorityAPI } from 'widget/api/conversation';
 import { createTemporaryMessage } from 'widget/store/modules/conversation/helpers';
 import MessageFormatter from 'shared/helpers/MessageFormatter';
+import Avatar from 'dashboard/components-next/avatar/Avatar.vue';
 
 export default {
   name: 'ConversationWrap',
@@ -19,6 +20,7 @@ export default {
     AgentTypingBubble,
     DateSeparator,
     Spinner,
+    Avatar,
   },
   props: {
     groupedMessages: {
@@ -814,8 +816,16 @@ We work with clients in all over the world! 🌍`,
           </div>
 
           <!-- Agent Message -->
-          <div v-else class="flex flex-col items-start max-w-[85%] mb-4">
-            <!-- Text Bubble -->
+          <div v-else class="flex items-end max-w-[95%] mb-4">
+            <div class="mr-2 flex-shrink-0">
+              <Avatar
+                :size="24"
+                name="KI Bot"
+                rounded-full
+              />
+            </div>
+            <div class="flex flex-col items-start w-[85%]">
+              <!-- Text Bubble -->
             <div
               v-if="msg.type === 'text'"
               class="shadow rounded-[1.25rem] rounded-bl-[0.25rem] px-4 py-2.5 inline-block text-sm text-[#1f2937] bg-white w-fit"
@@ -856,6 +866,8 @@ We work with clients in all over the world! 🌍`,
                   </li>
                 </ul>
               </div>
+            </div>
+            <p class="text-n-slate-11 text-xs mt-1 ml-2 mb-0 font-medium">KI Bot</p>
             </div>
           </div>
         </div>
