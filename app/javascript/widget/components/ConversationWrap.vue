@@ -520,7 +520,7 @@ We work with clients in all over the world! 🌍`,
     askProjectBrief() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'text',
-        text: 'Tell me briefly about your project by typing below.',
+        text: 'Tell me briefly about your project, or share a document link by typing below.',
       });
       this.currentInputStep = 'project_brief';
       this.waitingForFreeInput = true;
@@ -531,7 +531,7 @@ We work with clients in all over the world! 🌍`,
         id: Date.now(), sender: 'agent', type: 'options',
         title: "What's your ideal timeline?",
         options: [
-          { id: 't1', action: 'timeline_selected', title: 'ASAP - We need this urgent' },
+          { id: 't1', action: 'timeline_selected', title: 'ASAP We need this urgent' },
           { id: 't2', action: 'timeline_selected', title: '1-3 months' },
           { id: 't3', action: 'timeline_selected', title: '3-6 months' },
           { id: 't4', action: 'timeline_selected', title: '6+ months' },
@@ -545,11 +545,11 @@ We work with clients in all over the world! 🌍`,
         id: Date.now(), sender: 'agent', type: 'options',
         title: "And your approximate budget range?\nThis helps us recommend the right approach",
         options: [
-          { id: 'b1', action: 'budget_selected', title: 'Under $25K' },
-          { id: 'b2', action: 'budget_selected', title: '$25K - $100K' },
-          { id: 'b3', action: 'budget_selected', title: '$100K - $300K' },
-          { id: 'b4', action: 'budget_selected', title: '$300K+' },
-          { id: 'b5', action: 'budget_selected', title: 'Need guidance on budget' }
+          { id: 'b1', action: 'budget_selected', title: 'Under 10K' },
+          { id: 'b2', action: 'budget_selected', title: '10K-25K' },
+          { id: 'b3', action: 'budget_selected', title: '25K-40K' },
+          { id: 'b4', action: 'budget_selected', title: '40k +' },
+          { id: 'b5', action: 'budget_selected', title: 'Need guidance' }
         ],
         hideFields: false,
       });
@@ -575,7 +575,7 @@ We work with clients in all over the world! 🌍`,
     askReferralSource() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'options',
-        title: "One last thing — how did you hear about us?",
+        title: "One last thing, how did you hear about us?",
         options: [
           { id: 'r1', action: 'referral_selected', title: 'Google Search' },
           { id: 'r2', action: 'referral_selected', title: 'LinkedIn' },
@@ -760,7 +760,7 @@ We work with clients in all over the world! 🌍`,
           this.askFinalConfirmation();
         } else if (option.action === 'book_meeting' || option.id === 'book_call_now') {
           this.submitToHubspot();
-          window.open('https://meetings-na2.hubspot.com/kodexo', '_blank');
+          window.open('https://kodexolabs.com/book-a-meeting/', '_blank');
           this.askGoodbye();
         } else if (option.action === 'final_action') {
           this.submitToHubspot();
