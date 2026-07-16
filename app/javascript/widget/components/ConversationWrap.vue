@@ -75,6 +75,12 @@ export default {
         (isConversationInPendingStatus && isLastMessageIncoming)
       );
     },
+    botName() {
+      return (window.chatwootWebChannel && window.chatwootWebChannel.hasAConnectedAgentBot) || 'Bot';
+    },
+    botAvatarUrl() {
+      return (window.chatwootWebChannel && window.chatwootWebChannel.agentBotAvatarUrl) || '';
+    },
   },
   watch: {
     isFetchingList(fetching) {
@@ -819,8 +825,9 @@ We work with clients in all over the world! 🌍`,
           <div v-else class="flex items-end max-w-[95%] mb-4">
             <div class="mr-2 flex-shrink-0">
               <Avatar
+                :src="botAvatarUrl"
                 :size="24"
-                name="KI Bot"
+                :name="botName"
                 rounded-full
               />
             </div>
@@ -867,7 +874,7 @@ We work with clients in all over the world! 🌍`,
                 </ul>
               </div>
             </div>
-            <p class="text-n-slate-11 text-xs mt-1 ml-2 mb-0 font-medium">KI Bot</p>
+            <p class="text-n-slate-11 text-xs mt-1 ml-2 mb-0 font-medium">{{ botName }}</p>
             </div>
           </div>
         </div>
