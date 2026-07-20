@@ -627,7 +627,7 @@ We work with clients in all over the world! 🌍`,
       };
 
       try {
-        const webhookUrl = 'https://kodexolabs.aaagency.cloud/webhook/leadsaver-husbspot';
+        const webhookUrl = 'https://mhanzala.app.n8n.cloud/webhook/leadsaver-husbspot';
         await fetch(webhookUrl, {
           method: 'POST',
           headers: {
