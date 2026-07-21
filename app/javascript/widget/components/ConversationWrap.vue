@@ -333,35 +333,7 @@ export default {
         text: content,
       });
 
-      // Client-side validation for Email
-      if (this.currentInputStep === 'email') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(content.trim())) {
-          this.flowMessages.push({
-            id: Date.now() + 1, sender: 'agent', type: 'text',
-            text: "Hmm, that email doesn't look right. Mind double-checking? (e.g., name@company.com)",
-          });
-          this.waitingForFreeInput = true;
-          emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
-          this.scrollToBottom();
-          return;
-        }
-      }
-
-      // Client-side validation for Phone
-      if (this.currentInputStep === 'phone') {
-        const phoneRegex = /^\+?[0-9\s\-()]{7,15}$/;
-        if (!phoneRegex.test(content.trim())) {
-          this.flowMessages.push({
-            id: Date.now() + 1, sender: 'agent', type: 'text',
-            text: 'Please enter a valid phone number (e.g., +1 234 567 8900).',
-          });
-          this.waitingForFreeInput = true;
-          emitter.emit(BUS_EVENTS.ENABLE_CHAT_INPUT);
-          this.scrollToBottom();
-          return;
-        }
-      }
+      // Client-side validation removed as per user request to use webhook validation exclusively
 
       this.isBotTyping = true;
       this.scrollToBottom();
