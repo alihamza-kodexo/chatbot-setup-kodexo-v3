@@ -528,7 +528,7 @@ We work with clients in all over the world! 🌍`,
     askProjectBrief() {
       this.flowMessages.push({
         id: Date.now(), sender: 'agent', type: 'text',
-        text: 'Tell me briefly about your project, or share a document link by typing below.',
+        text: 'Tell me briefly about your project by typing below.',
       });
       this.currentInputStep = 'project_brief';
       this.waitingForFreeInput = true;
