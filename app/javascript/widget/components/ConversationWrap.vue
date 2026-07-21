@@ -370,15 +370,15 @@ export default {
       const tempMessage = createTemporaryMessage({ content: `[${this.currentInputStep}] ${content}` });
       
       try {
-        if (this.currentInputStep === 'project_brief') {
-          // Only wait for n8n AI validation on complex free-text fields
+        if (['project_brief', 'email', 'phone'].includes(this.currentInputStep)) {
+          // Wait for n8n AI validation on free-text fields
           this.isWaitingForValidation = true;
           await this.sendMessageWithData(tempMessage);
         } else if (this.isCustomerSupportMode) {
           // Just send the message and don't proceed to any next step
           this.sendMessageWithData(tempMessage).catch(() => {});
         } else {
-          // Instantly proceed for fields validated client-side (email/phone)
+          // Instantly proceed for other fields (if any)
           this.sendMessageWithData(tempMessage).catch(() => {});
           this.proceedToNextStep();
         }
